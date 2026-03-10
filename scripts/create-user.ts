@@ -4,9 +4,10 @@ import { prisma } from "../app/lib/db.server";
 
 const email = process.argv[2];
 const password = process.argv[3];
+const name = process.argv[4] || email;
 
 if (!email || !password) {
-  console.error("Usage: npm run db:create-user <email> <password>");
+  console.error("Usage: npm run db:create-user <email> <password> [name]");
   process.exit(1);
 }
 
@@ -23,6 +24,15 @@ async function main() {
   const user = await prisma.user.create({
     data: {
       email,
+      name,
+    },
+  });
+
+  await prisma.account.create({
+    data: {
+      accountId: user.id,
+      providerId: "credential",
+      userId: user.id,
       password: hashedPassword,
     },
   });

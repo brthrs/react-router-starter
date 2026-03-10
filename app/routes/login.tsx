@@ -1,69 +1,53 @@
-import { type LoaderFunctionArgs, type ActionFunctionArgs, data, redirect } from "react-router";
-import { Form, useActionData, useNavigation } from "react-router";
+import { type LoaderFunctionArgs, redirect } from "react-router";
+import { useNavigate } from "react-router";
+import { useState } from "react";
 import type { Route } from "./+types/login";
-import { validateCredentials, createSessionCookie, getSessionFromCookie } from "../lib/auth.server";
-import { logActivity } from "../lib/activity-log.server";
-import { Input } from "../components/ui/input";
-import { Button } from "../components/ui/button";
+import { auth } from "~/lib/auth.server";
+import { authClient } from "~/lib/auth-client";
+import { Input } from "~/components/ui/input";
+import { Button } from "~/components/ui/button";
 
 export function meta(_args: Route.MetaArgs) {
   return [{ title: "Login - Railcenter Datalake Admin" }];
 }
 
 export async function loader({ request }: LoaderFunctionArgs) {
-  const cookieHeader = request.headers.get("Cookie");
-  const session = getSessionFromCookie(cookieHeader);
-  
-  // If already logged in, redirect to admin
+  const session = await auth.api.getSession({
+    headers: request.headers,
+  });
+
   if (session) {
     throw redirect("/admin");
   }
-  
+
   return {};
 }
 
-export async function action({ request }: ActionFunctionArgs) {
-  const formData = await request.formData();
-  const email = formData.get("email");
-  const password = formData.get("password");
-
-  if (typeof email !== "string" || typeof password !== "string") {
-    return data(
-      { error: "Invalid form submission" },
-      { status: 400 }
-    );
-  }
-
-  const userId = await validateCredentials(email, password);
-
-  if (!userId) {
-    return data(
-      { error: "Invalid email or password" },
-      { status: 401 }
-    );
-  }
-
-  // Log the login activity
-  await logActivity({
-    userId,
-    action: "LOGIN",
-    request,
-  });
-
-  // Create session cookie with user ID
-  const cookie = createSessionCookie(userId);
-
-  return redirect("/admin", {
-    headers: {
-      "Set-Cookie": cookie,
-    },
-  });
-}
-
 export default function Login() {
-  const actionData = useActionData<typeof action>();
-  const navigation = useNavigation();
-  const isSubmitting = navigation.state === "submitting";
+  const navigate = useNavigate();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError(null);
+    setIsSubmitting(true);
+
+    await authClient.signIn.email(
+      { email, password },
+      {
+        onSuccess: () => {
+          navigate("/admin");
+        },
+        onError: (ctx) => {
+          setError(ctx.error.message);
+          setIsSubmitting(false);
+        },
+      },
+    );
+  };
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-background px-4">
@@ -76,20 +60,21 @@ export default function Login() {
         </div>
 
         <div className="bg-card rounded-lg shadow-sm border p-8">
-          <Form method="post" className="space-y-6">
+          <form onSubmit={handleSubmit} className="space-y-6">
             <div className="space-y-2">
               <label htmlFor="email" className="text-sm font-medium text-foreground">
                 Email
               </label>
               <Input
                 id="email"
-                name="email"
                 type="email"
                 autoComplete="email"
                 required
                 placeholder="Enter your email"
                 className="h-11"
                 disabled={isSubmitting}
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
               />
             </div>
 
@@ -99,19 +84,20 @@ export default function Login() {
               </label>
               <Input
                 id="password"
-                name="password"
                 type="password"
                 autoComplete="current-password"
                 required
                 placeholder="Enter your password"
                 className="h-11"
                 disabled={isSubmitting}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
               />
             </div>
 
-            {actionData?.error && (
+            {error && (
               <div className="rounded-md bg-destructive/10 border border-destructive/20 px-4 py-3">
-                <p className="text-sm text-destructive">{actionData.error}</p>
+                <p className="text-sm text-destructive">{error}</p>
               </div>
             )}
 
@@ -122,12 +108,8 @@ export default function Login() {
             >
               {isSubmitting ? "Signing in..." : "Sign in"}
             </Button>
-          </Form>
+          </form>
         </div>
-
-        <p className="text-center text-sm text-muted-foreground">
-          Your session will never expire
-        </p>
       </div>
     </div>
   );

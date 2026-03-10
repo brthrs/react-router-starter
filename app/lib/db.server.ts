@@ -1,5 +1,5 @@
 import { PrismaClient } from '@prisma/client';
-import { PrismaBetterSqlite3 } from '@prisma/adapter-better-sqlite3';
+import { PrismaPg } from '@prisma/adapter-pg';
 
 let prisma: PrismaClient;
 
@@ -7,13 +7,10 @@ declare global {
   var __db__: PrismaClient | undefined;
 }
 
-// This is needed because in development we don't want to restart
-// the server with every change, but we want to make sure we don't
-// create a new connection to the DB with every change either.
 const isProduction = process.env.NODE_ENV === 'production';
 
-const adapter = new PrismaBetterSqlite3({
-  url: process.env.DATABASE_URL!,
+const adapter = new PrismaPg({
+  connectionString: process.env.DATABASE_URL!,
 });
 
 if (isProduction) {

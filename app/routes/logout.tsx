@@ -1,34 +1,34 @@
 import { type ActionFunctionArgs, redirect } from "react-router";
-import { destroySessionCookie, getSessionFromCookie } from "../lib/auth.server";
-import { logActivity } from "../lib/activity-log.server";
+import { auth } from "~/lib/auth.server";
+import { logActivity } from "~/lib/activity-log.server";
 
 export async function action({ request }: ActionFunctionArgs) {
-  // Get the user ID before destroying the session
-  const cookieHeader = request.headers.get("Cookie");
-  const userId = getSessionFromCookie(cookieHeader);
+  const session = await auth.api.getSession({
+    headers: request.headers,
+  });
 
-  // Log logout activity if user was logged in
-  if (userId) {
+  if (session) {
     await logActivity({
-      userId,
+      userId: session.user.id,
       action: "LOGOUT",
       request,
     });
   }
 
-  const cookie = destroySessionCookie();
-  
-  return redirect("/login", {
-    headers: {
-      "Set-Cookie": cookie,
-    },
+  const signOutResponse = await auth.api.signOut({
+    headers: request.headers,
+    asResponse: true,
   });
+
+  const setCookie = signOutResponse.headers.get("Set-Cookie");
+  const headers = new Headers();
+  if (setCookie) {
+    headers.set("Set-Cookie", setCookie);
+  }
+
+  return redirect("/login", { headers });
 }
 
 export async function loader() {
   return redirect("/");
 }
-
-
-
-

@@ -32,6 +32,7 @@ export async function loader({ request }: Route.LoaderArgs) {
       select: {
         id: true,
         email: true,
+        name: true,
         createdAt: true,
       },
       orderBy: {
@@ -68,11 +69,9 @@ export default function Users({ loaderData }: Route.ComponentProps) {
   const [searchParams, setSearchParams] = useSearchParams();
   const { users, pagination, searchQuery } = loaderData as unknown as LoaderData;
 
-  // Show toast notifications based on URL params
   useEffect(() => {
     if (searchParams.get("created") === "true") {
       toast.success("User created successfully");
-      // Clean up the URL
       const newParams = new URLSearchParams(searchParams);
       newParams.delete("created");
       setSearchParams(newParams, { replace: true });
@@ -155,6 +154,9 @@ export default function Users({ loaderData }: Route.ComponentProps) {
                   Email
                 </th>
                 <th className="px-6 py-3 text-left text-sm font-medium text-foreground">
+                  Name
+                </th>
+                <th className="px-6 py-3 text-left text-sm font-medium text-foreground">
                   Created At
                 </th>
                 <th className="px-6 py-3 text-right text-sm font-medium text-foreground">
@@ -165,16 +167,21 @@ export default function Users({ loaderData }: Route.ComponentProps) {
             <tbody className="divide-y">
               {users.length === 0 ? (
                 <tr>
-                  <td colSpan={3} className="px-6 py-12 text-center text-muted-foreground">
+                  <td colSpan={4} className="px-6 py-12 text-center text-muted-foreground">
                     {searchQuery ? "No users found matching your search" : "No users yet"}
                   </td>
                 </tr>
               ) : (
-                users.map((user: { id: string; email: string; createdAt: Date }) => (
+                users.map((user) => (
                   <tr key={user.id} className="hover:bg-muted/30 transition-colors">
                     <td className="px-6 py-4">
                       <div className="text-sm font-medium text-foreground">
                         {user.email}
+                      </div>
+                    </td>
+                    <td className="px-6 py-4">
+                      <div className="text-sm text-muted-foreground">
+                        {user.name}
                       </div>
                     </td>
                     <td className="px-6 py-4">
@@ -237,4 +244,3 @@ export default function Users({ loaderData }: Route.ComponentProps) {
     </div>
   );
 }
-

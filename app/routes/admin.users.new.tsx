@@ -1,7 +1,7 @@
 import { Form, Link, redirect, useActionData, useNavigation } from "react-router";
 import { ArrowLeft, Loader2 } from "lucide-react";
 import type { Route } from "./+types/admin.users.new";
-import { requireAuth, createUser } from "~/lib/auth.server";
+import { requireAuth, auth } from "~/lib/auth.server";
 import { logActivity } from "~/lib/activity-log.server";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
@@ -14,18 +14,22 @@ export async function loader({ request }: Route.LoaderArgs) {
 }
 
 export async function action({ request }: Route.ActionArgs) {
-  const currentUserId = await requireAuth(request);
+  const session = await requireAuth(request);
 
   const formData = await request.formData();
   const email = formData.get("email") as string;
+  const name = formData.get("name") as string;
   const password = formData.get("password") as string;
   const confirmPassword = formData.get("confirmPassword") as string;
 
   const errors: Record<string, string> = {};
 
-  // Validation
   if (!email || !email.includes("@")) {
     errors.email = "Please enter a valid email address";
+  }
+
+  if (!name || name.trim().length === 0) {
+    errors.name = "Please enter a name";
   }
 
   if (!password || password.length < 8) {
@@ -36,7 +40,6 @@ export async function action({ request }: Route.ActionArgs) {
     errors.confirmPassword = "Passwords do not match";
   }
 
-  // Check if user already exists
   if (email) {
     const existingUser = await prisma.user.findUnique({
       where: { email },
@@ -51,15 +54,15 @@ export async function action({ request }: Route.ActionArgs) {
     return { errors };
   }
 
-  // Create the user
-  const newUser = await createUser(email, password);
+  const newUser = await auth.api.signUpEmail({
+    body: { email, password, name },
+  });
 
-  // Log the activity
   await logActivity({
-    userId: currentUserId,
+    userId: session.user.id,
     action: "USER_CREATED",
     entityType: "USER",
-    entityId: newUser.id,
+    entityId: newUser.user.id,
     details: { email },
     request,
   });
@@ -95,6 +98,22 @@ export default function NewUser() {
       {/* Form */}
       <div className="rounded-xl border bg-card shadow-sm p-6">
         <Form method="post" className="space-y-6">
+          {/* Name Field */}
+          <div className="space-y-2">
+            <Label htmlFor="name">Name</Label>
+            <Input
+              id="name"
+              name="name"
+              type="text"
+              placeholder="John Doe"
+              required
+              aria-invalid={actionData?.errors?.name ? true : undefined}
+            />
+            {actionData?.errors?.name && (
+              <p className="text-sm text-destructive">{actionData.errors.name}</p>
+            )}
+          </div>
+
           {/* Email Field */}
           <div className="space-y-2">
             <Label htmlFor="email">Email</Label>
@@ -163,4 +182,3 @@ export default function NewUser() {
     </div>
   );
 }
-

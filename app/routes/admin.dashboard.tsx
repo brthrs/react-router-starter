@@ -1,11 +1,13 @@
 import type { Route } from "./+types/admin.dashboard";
+import { requireAuth } from "~/lib/auth.server";
 import { prisma } from "~/lib/db.server";
 
 export function meta(_args: Route.MetaArgs) {
   return [{ title: "Dashboard - Admin" }];
 }
 
-export async function loader() {
+export async function loader({ request }: Route.LoaderArgs) {
+  await requireAuth(request);
   const last7Days = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
   const last24Hours = new Date(Date.now() - 24 * 60 * 60 * 1000);
   const last30Days = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);

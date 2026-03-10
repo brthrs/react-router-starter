@@ -63,7 +63,6 @@ export default function ActivityLog({ loaderData }: Route.ComponentProps) {
   };
 
   const getActionBadgeColor = (action: string) => {
-    // Generate a consistent color based on the action string
     const hash = action.split('').reduce((acc, char) => {
       return char.charCodeAt(0) + ((acc << 5) - acc);
     }, 0);
@@ -244,4 +243,3 @@ export default function ActivityLog({ loaderData }: Route.ComponentProps) {
     </div>
   );
 }
-

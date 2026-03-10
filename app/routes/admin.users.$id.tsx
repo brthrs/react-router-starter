@@ -9,13 +9,14 @@ import { Label } from "~/components/ui/label";
 import { prisma } from "~/lib/db.server";
 
 export async function loader({ request, params }: Route.LoaderArgs) {
-  const currentUserId = await requireAuth(request);
+  const session = await requireAuth(request);
 
   const user = await prisma.user.findUnique({
     where: { id: params.id },
     select: {
       id: true,
       email: true,
+      name: true,
       createdAt: true,
       updatedAt: true,
     },
@@ -25,23 +26,21 @@ export async function loader({ request, params }: Route.LoaderArgs) {
     throw new Response("User not found", { status: 404 });
   }
 
-  return { user, currentUserId };
+  return { user, currentUserId: session.user.id };
 }
 
 export async function action({ request, params }: Route.ActionArgs) {
-  const currentUserId = await requireAuth(request);
+  const session = await requireAuth(request);
+  const currentUserId = session.user.id;
 
   const formData = await request.formData();
   const intent = formData.get("intent") as string;
 
-  // Handle delete
   if (intent === "delete") {
-    // Prevent self-deletion
     if (currentUserId === params.id) {
       return { errors: { delete: "You cannot delete your own account" } };
     }
 
-    // Get user info before deleting
     const userToDelete = await prisma.user.findUnique({
       where: { id: params.id },
       select: { email: true },
@@ -51,7 +50,6 @@ export async function action({ request, params }: Route.ActionArgs) {
       where: { id: params.id },
     });
 
-    // Log the activity
     await logActivity({
       userId: currentUserId,
       action: "USER_DELETED",
@@ -64,26 +62,26 @@ export async function action({ request, params }: Route.ActionArgs) {
     return redirect("/admin/users?deleted=true");
   }
 
-  // Handle update
   const email = formData.get("email") as string;
+  const name = formData.get("name") as string;
   const password = formData.get("password") as string;
   const confirmPassword = formData.get("confirmPassword") as string;
 
   const errors: Record<string, string> = {};
 
-  // Validation
   if (!email || !email.includes("@")) {
     errors.email = "Please enter a valid email address";
   }
 
-  // Check if email is already taken by another user
+  if (!name || name.trim().length === 0) {
+    errors.name = "Please enter a name";
+  }
+
   if (email) {
     const existingUser = await prisma.user.findFirst({
       where: {
         email,
-        NOT: {
-          id: params.id,
-        },
+        NOT: { id: params.id },
       },
     });
 
@@ -92,7 +90,6 @@ export async function action({ request, params }: Route.ActionArgs) {
     }
   }
 
-  // Password validation (only if password is provided)
   if (password || confirmPassword) {
     if (!password || password.length < 8) {
       errors.password = "Password must be at least 8 characters";
@@ -107,20 +104,20 @@ export async function action({ request, params }: Route.ActionArgs) {
     return { errors };
   }
 
-  // Update the user
-  const updateData: { email: string; password?: string } = { email };
-
-  if (password) {
-    updateData.password = await hashPassword(password);
-  }
-
   await prisma.user.update({
     where: { id: params.id },
-    data: updateData,
+    data: { email, name },
   });
 
-  // Log the activity
-  const details: Record<string, unknown> = { email };
+  if (password) {
+    const hashedPassword = await hashPassword(password);
+    await prisma.account.updateMany({
+      where: { userId: params.id, providerId: "credential" },
+      data: { password: hashedPassword },
+    });
+  }
+
+  const details: Record<string, unknown> = { email, name };
   if (password) {
     details.passwordChanged = true;
   }
@@ -188,6 +185,23 @@ export default function EditUser({ loaderData }: Route.ComponentProps) {
       {/* Edit Form */}
       <div className="rounded-xl border bg-card shadow-sm p-6">
         <Form method="post" className="space-y-6">
+          {/* Name Field */}
+          <div className="space-y-2">
+            <Label htmlFor="name">Name</Label>
+            <Input
+              id="name"
+              name="name"
+              type="text"
+              defaultValue={user.name}
+              placeholder="John Doe"
+              required
+              aria-invalid={actionData?.errors?.name ? true : undefined}
+            />
+            {actionData?.errors?.name && (
+              <p className="text-sm text-destructive">{actionData.errors.name}</p>
+            )}
+          </div>
+
           {/* Email Field */}
           <div className="space-y-2">
             <Label htmlFor="email">Email</Label>
@@ -292,4 +306,3 @@ export default function EditUser({ loaderData }: Route.ComponentProps) {
     </div>
   );
 }
-
