@@ -1,4 +1,7 @@
 import nodemailer from "nodemailer";
+import { logger } from "./logger.server";
+
+const log = logger.child({ module: "email" });
 
 const transporter = nodemailer.createTransport({
   host: process.env.SMTP_HOST,
@@ -10,17 +13,27 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-interface SendEmailOptions {
+export interface SendEmailOptions {
   to: string;
   subject: string;
   text: string;
   html?: string;
 }
 
-export function sendEmail({ to, subject, text, html }: SendEmailOptions): void {
-  const from = process.env.SMTP_FROM ?? "noreply@example.com";
+export function sendEmail(options: SendEmailOptions): void {
+  if (process.env.QUEUE_EMAILS === "true") {
+    import("./queue.server").then(({ sendEmailJob }) => {
+      sendEmailJob(options).catch((err) => {
+        log.error({ err, to: options.to, subject: options.subject }, "Failed to queue email");
+      });
+    });
+    return;
+  }
 
-  transporter.sendMail({ from, to, subject, text, html }).catch((err) => {
-    console.error("[email] Failed to send email:", err);
+  const from = process.env.SMTP_FROM ?? "noreply@example.com";
+  transporter.sendMail({ from, ...options }).catch((err) => {
+    log.error({ err, to: options.to, subject: options.subject }, "Failed to send email");
   });
 }
+
+export { transporter };

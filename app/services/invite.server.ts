@@ -2,6 +2,9 @@ import { randomBytes } from "crypto";
 import { prisma } from "~/lib/db.server";
 import { hashPassword } from "~/lib/auth/server";
 import { sendEmail } from "~/lib/email.server";
+import { logger } from "~/lib/logger.server";
+
+const log = logger.child({ module: "invite" });
 
 export async function createInvite(
   userId: string | null,
@@ -20,7 +23,7 @@ export async function createInvite(
   const inviteUrl = `${baseUrl}/accept-invite?token=${token}`;
 
   if (process.env.NODE_ENV === "development") {
-    console.log(`[invite] URL for ${email}: ${inviteUrl}`);
+    log.info({ email, inviteUrl }, "Invite URL generated (dev mode)");
   } else {
     sendEmail({
       to: email,

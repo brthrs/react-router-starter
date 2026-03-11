@@ -10,3 +10,6 @@
 /generated/prisma
 /prisma/*.db
 /prisma/*.db-journal
+
+# Uploads
+/public/uploads/

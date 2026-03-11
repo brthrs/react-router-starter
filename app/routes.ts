@@ -12,6 +12,7 @@ export default [
   route("/profile", "routes/profile.tsx"),
   route("/accept-invite", "routes/accept-invite.tsx"),
   route("/api/hello", "routes/api/hello.ts"),
+  route("/api/upload-avatar", "routes/api/upload-avatar.ts"),
   route("/api/auth/*", "routes/api/auth.$.ts"),
   layout("routes/admin/_layout.tsx", [
     route("/admin", "routes/admin/dashboard.tsx"),
