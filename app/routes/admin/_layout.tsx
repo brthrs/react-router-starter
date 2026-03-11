@@ -1,15 +1,15 @@
 import { Outlet, useLoaderData } from "react-router";
-import type { Route } from "./+types/admin";
-import { requireAuth } from "~/lib/auth.server";
-import { AdminLayout } from "~/components/admin-layout";
+import type { Route } from "./+types/_layout";
+import { requireAdmin } from "~/lib/auth/server";
+import { AdminLayout } from "~/components/layouts/admin-layout";
 
 export async function loader({ request }: Route.LoaderArgs) {
-  const session = await requireAuth(request);
+  const session = await requireAdmin(request);
   return { userEmail: session.user.email };
 }
 
 export function meta(_args: Route.MetaArgs) {
-  return [{ title: "Admin - Railcenter Datalake" }];
+  return [{ title: "Admin - React Router Starter" }];
 }
 
 export default function Admin() {

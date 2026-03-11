@@ -1,5 +1,5 @@
 import { NavLink } from "react-router";
-import { cn } from "../lib/utils";
+import { cn } from "~/lib/utils";
 
 interface AdminLayoutProps {
   children: React.ReactNode;
@@ -9,26 +9,22 @@ interface AdminLayoutProps {
 const navigation = [
   { name: "Dashboard", href: "/admin", icon: LayoutDashboardIcon },
   { name: "Users", href: "/admin/users", icon: UsersIcon },
-  { name: "Activity Log", href: "/admin/activity", icon: ActivityIcon },
 ];
 
 export function AdminLayout({ children, userEmail }: AdminLayoutProps) {
   return (
     <div className="flex min-h-screen bg-background">
-      {/* Sidebar */}
       <aside className="fixed inset-y-0 left-0 z-50 w-64 flex flex-col bg-sidebar border-r border-sidebar-border">
-        {/* Logo */}
         <div className="flex h-16 items-center gap-3 px-6 border-b border-sidebar-border">
           <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-sidebar-primary">
             <TrainIcon className="h-5 w-5 text-sidebar-primary-foreground" />
           </div>
           <div className="flex flex-col">
-            <span className="text-sm font-semibold text-sidebar-foreground">Railcenter</span>
-            <span className="text-xs text-muted-foreground">Datalake Admin</span>
+            <span className="text-sm font-semibold text-sidebar-foreground">React Router Starter</span>
+            <span className="text-xs text-muted-foreground">Admin</span>
           </div>
         </div>
 
-        {/* Navigation */}
         <nav className="flex-1 px-3 py-4 space-y-1">
           {navigation.map((item) => (
             <NavLink
@@ -50,7 +46,6 @@ export function AdminLayout({ children, userEmail }: AdminLayoutProps) {
           ))}
         </nav>
 
-        {/* User section */}
         <div className="border-t border-sidebar-border p-4">
           <div className="flex items-center gap-3">
             <div className="flex h-9 w-9 items-center justify-center rounded-full bg-sidebar-accent">
@@ -74,17 +69,13 @@ export function AdminLayout({ children, userEmail }: AdminLayoutProps) {
         </div>
       </aside>
 
-      {/* Main content */}
       <main className="flex-1 ml-64">
-        <div className="h-full p-8">
-          {children}
-        </div>
+        <div className="h-full p-8">{children}</div>
       </main>
     </div>
   );
 }
 
-// Icons
 function LayoutDashboardIcon({ className }: { className?: string }) {
   return (
     <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
@@ -125,14 +116,6 @@ function TrainIcon({ className }: { className?: string }) {
       <circle cx="8.5" cy="14" r="1" fill="currentColor" />
       <circle cx="15.5" cy="14" r="1" fill="currentColor" />
       <path strokeLinecap="round" strokeLinejoin="round" d="M2 21h20" />
-    </svg>
-  );
-}
-
-function ActivityIcon({ className }: { className?: string }) {
-  return (
-    <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-      <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
     </svg>
   );
 }

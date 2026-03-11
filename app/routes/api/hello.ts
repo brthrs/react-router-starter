@@ -1,4 +1,4 @@
-import type { Route } from "./+types/api.hello";
+import type { Route } from "./+types/hello";
 
 export async function loader({ request }: Route.LoaderArgs) {
   const url = new URL(request.url);

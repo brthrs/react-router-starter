@@ -1,43 +1,33 @@
 import "dotenv/config";
-import bcrypt from "bcryptjs";
+import { auth } from "../app/lib/auth/server";
 import { prisma } from "../app/lib/db.server";
 
 const email = process.argv[2];
 const password = process.argv[3];
 const name = process.argv[4] || email;
+const role = process.argv[5] || "admin";
 
 if (!email || !password) {
-  console.error("Usage: npm run db:create-user <email> <password> [name]");
+  console.error("Usage: npm run db:create-user <email> <password> [name] [role=admin]");
+  process.exit(1);
+}
+
+if (role !== "admin" && role !== "user") {
+  console.error('Role must be "admin" or "user"');
   process.exit(1);
 }
 
 async function main() {
-  const existing = await prisma.user.findUnique({ where: { email } });
-  
-  if (existing) {
-    console.error(`User with email "${email}" already exists.`);
-    process.exit(1);
-  }
-
-  const hashedPassword = await bcrypt.hash(password, 10);
-  
-  const user = await prisma.user.create({
-    data: {
-      email,
-      name,
-    },
+  const result = await auth.api.signUpEmail({
+    body: { email, password, name },
   });
 
-  await prisma.account.create({
-    data: {
-      accountId: user.id,
-      providerId: "credential",
-      userId: user.id,
-      password: hashedPassword,
-    },
+  await prisma.user.update({
+    where: { id: result.user.id },
+    data: { role, emailVerified: true },
   });
 
-  console.log(`User created: ${user.email} (${user.id})`);
+  console.log(`User created: ${result.user.email} (${result.user.id}) — role: ${role}`);
 }
 
 main()

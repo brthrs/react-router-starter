@@ -1,24 +1,23 @@
 import { Form, Link, redirect, useActionData, useNavigation } from "react-router";
 import { ArrowLeft, Loader2 } from "lucide-react";
-import type { Route } from "./+types/admin.users.new";
-import { requireAuth, auth } from "~/lib/auth.server";
-import { logActivity } from "~/lib/activity-log.server";
+import type { Route } from "./+types/new";
+import { requireAdmin, auth } from "~/lib/auth/server";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
-import { prisma } from "~/lib/db.server";
 
 export async function loader({ request }: Route.LoaderArgs) {
-  await requireAuth(request);
+  await requireAdmin(request);
   return {};
 }
 
 export async function action({ request }: Route.ActionArgs) {
-  const session = await requireAuth(request);
+  await requireAdmin(request);
 
   const formData = await request.formData();
   const email = formData.get("email") as string;
   const name = formData.get("name") as string;
+  const role = formData.get("role") as string;
   const password = formData.get("password") as string;
   const confirmPassword = formData.get("confirmPassword") as string;
 
@@ -40,38 +39,22 @@ export async function action({ request }: Route.ActionArgs) {
     errors.confirmPassword = "Passwords do not match";
   }
 
-  if (email) {
-    const existingUser = await prisma.user.findUnique({
-      where: { email },
-    });
-
-    if (existingUser) {
-      errors.email = "A user with this email already exists";
-    }
-  }
-
   if (Object.keys(errors).length > 0) {
     return { errors };
   }
 
-  const newUser = await auth.api.signUpEmail({
-    body: { email, password, name },
-  });
+  const validRole = role === "admin" || role === "user" ? role : "user";
 
-  await logActivity({
-    userId: session.user.id,
-    action: "USER_CREATED",
-    entityType: "USER",
-    entityId: newUser.user.id,
-    details: { email },
-    request,
+  await auth.api.createUser({
+    body: { email, password, name, role: validRole },
+    headers: request.headers,
   });
 
   return redirect("/admin/users?created=true");
 }
 
 export function meta(_args: Route.MetaArgs) {
-  return [{ title: "Add User - Railcenter Datalake Admin" }];
+  return [{ title: "Add User - React Router Starter" }];
 }
 
 export default function NewUser() {
@@ -81,7 +64,6 @@ export default function NewUser() {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
       <div>
         <Button asChild variant="ghost" size="sm" className="mb-4">
           <Link to="/admin/users">
@@ -95,10 +77,8 @@ export default function NewUser() {
         </p>
       </div>
 
-      {/* Form */}
       <div className="rounded-xl border bg-card shadow-sm p-6">
         <Form method="post" className="space-y-6">
-          {/* Name Field */}
           <div className="space-y-2">
             <Label htmlFor="name">Name</Label>
             <Input
@@ -114,7 +94,6 @@ export default function NewUser() {
             )}
           </div>
 
-          {/* Email Field */}
           <div className="space-y-2">
             <Label htmlFor="email">Email</Label>
             <Input
@@ -130,7 +109,19 @@ export default function NewUser() {
             )}
           </div>
 
-          {/* Password Field */}
+          <div className="space-y-2">
+            <Label htmlFor="role">Role</Label>
+            <select
+              id="role"
+              name="role"
+              defaultValue="user"
+              className="flex h-11 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+            >
+              <option value="user">User</option>
+              <option value="admin">Admin</option>
+            </select>
+          </div>
+
           <div className="space-y-2">
             <Label htmlFor="password">Password</Label>
             <Input
@@ -150,7 +141,6 @@ export default function NewUser() {
             </p>
           </div>
 
-          {/* Confirm Password Field */}
           <div className="space-y-2">
             <Label htmlFor="confirmPassword">Confirm Password</Label>
             <Input
@@ -167,7 +157,6 @@ export default function NewUser() {
             )}
           </div>
 
-          {/* Actions */}
           <div className="flex items-center gap-3 pt-4">
             <Button type="submit" disabled={isSubmitting}>
               {isSubmitting && <Loader2 className="animate-spin" />}
