@@ -10,6 +10,7 @@ export default [
   route("/verify-email", "routes/verify-email.tsx"),
   route("/two-factor", "routes/two-factor.tsx"),
   route("/profile", "routes/profile.tsx"),
+  route("/accept-invite", "routes/accept-invite.tsx"),
   route("/api/hello", "routes/api/hello.ts"),
   route("/api/auth/*", "routes/api/auth.$.ts"),
   layout("routes/admin/_layout.tsx", [

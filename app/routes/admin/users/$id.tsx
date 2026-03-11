@@ -1,24 +1,33 @@
 import { Form, Link, redirect, useActionData, useNavigation } from "react-router";
-import { ArrowLeft, Loader2, Trash2 } from "lucide-react";
+import { ArrowLeft, Loader2, Mail, Trash2 } from "lucide-react";
+import { z } from "zod";
 import type { Route } from "./+types/$id";
-import { requireAdmin, auth } from "~/lib/auth/server";
+import { requireAdmin } from "~/lib/auth/server";
+import { getUserById, updateUser, deleteUser } from "~/services/user.server";
+import { resendInvite } from "~/services/invite.server";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
 
+const schema = z.object({
+  name: z.string().min(1, "Please enter a name"),
+  email: z.string().email("Please enter a valid email address"),
+  role: z.string().optional(),
+});
+
+interface ActionErrors {
+  name?: string[];
+  email?: string[];
+  role?: string[];
+  delete?: string[];
+  invite?: string[];
+}
+
 export async function loader({ request, params }: Route.LoaderArgs) {
   const session = await requireAdmin(request);
+  const { user, hasPendingInvite } = await getUserById(params.id as string);
 
-  const user = await auth.api.getUser({
-    query: { id: params.id as string },
-    headers: request.headers,
-  });
-
-  if (!user) {
-    throw new Response("User not found", { status: 404 });
-  }
-
-  return { user, currentUserId: session.user.id };
+  return { user, currentUserId: session.user.id, hasPendingInvite };
 }
 
 export async function action({ request, params }: Route.ActionArgs) {
@@ -31,64 +40,36 @@ export async function action({ request, params }: Route.ActionArgs) {
 
   if (intent === "delete") {
     if (currentUserId === userId) {
-      return { errors: { delete: "You cannot delete your own account" } };
+      return { errors: { delete: ["You cannot delete your own account"] } as ActionErrors };
     }
 
-    await auth.api.removeUser({
-      body: { userId },
-      headers: request.headers,
-    });
+    await deleteUser(userId, request.headers);
 
     return redirect("/admin/users?deleted=true");
   }
 
-  const email = formData.get("email") as string;
-  const name = formData.get("name") as string;
-  const role = formData.get("role") as string;
-  const password = formData.get("password") as string;
-  const confirmPassword = formData.get("confirmPassword") as string;
-
-  const errors: Record<string, string> = {};
-
-  if (!email || !email.includes("@")) {
-    errors.email = "Please enter a valid email address";
-  }
-
-  if (!name || name.trim().length === 0) {
-    errors.name = "Please enter a name";
-  }
-
-  if (password || confirmPassword) {
-    if (!password || password.length < 8) {
-      errors.password = "Password must be at least 8 characters";
+  if (intent === "resend-invite") {
+    try {
+      await resendInvite(userId);
+    } catch {
+      return { errors: { invite: ["User not found"] } as ActionErrors };
     }
-    if (password !== confirmPassword) {
-      errors.confirmPassword = "Passwords do not match";
-    }
+
+    return { success: { invite: "Invite resent successfully" } };
   }
 
-  if (Object.keys(errors).length > 0) {
-    return { errors };
-  }
-
-  const validRole = role === "admin" || role === "user" ? role : "user";
-
-  await auth.api.adminUpdateUser({
-    body: { userId, data: { name, email } },
-    headers: request.headers,
+  const result = schema.safeParse({
+    name: formData.get("name"),
+    email: formData.get("email"),
+    role: formData.get("role"),
   });
 
-  await auth.api.setRole({
-    body: { userId, role: validRole },
-    headers: request.headers,
-  });
-
-  if (password) {
-    await auth.api.setUserPassword({
-      body: { userId, newPassword: password },
-      headers: request.headers,
-    });
+  if (!result.success) {
+    return { errors: result.error.flatten().fieldErrors as ActionErrors };
   }
+
+  const { name, email, role } = result.data;
+  await updateUser(userId, { name, email, role: role ?? "user" }, request.headers);
 
   return redirect("/admin/users?updated=true");
 }
@@ -98,11 +79,12 @@ export function meta({ data }: Route.MetaArgs) {
 }
 
 export default function EditUser({ loaderData }: Route.ComponentProps) {
-  const { user, currentUserId } = loaderData;
+  const { user, currentUserId, hasPendingInvite } = loaderData;
   const actionData = useActionData<typeof action>();
   const navigation = useNavigation();
   const isSubmitting = navigation.state === "submitting";
   const isDeleting = isSubmitting && navigation.formData?.get("intent") === "delete";
+  const isResending = isSubmitting && navigation.formData?.get("intent") === "resend-invite";
   const isSelf = currentUserId === user.id;
 
   return (
@@ -125,7 +107,7 @@ export default function EditUser({ loaderData }: Route.ComponentProps) {
           <p className="text-sm text-muted-foreground">User ID</p>
           <p className="font-mono text-sm">{user.id}</p>
         </div>
-        <div className="space-y-1">
+        <div className="space-y-1 mb-6">
           <p className="text-sm text-muted-foreground">Created</p>
           <p className="text-sm">
             {new Date(user.createdAt).toLocaleDateString("en-US", {
@@ -137,7 +119,45 @@ export default function EditUser({ loaderData }: Route.ComponentProps) {
             })}
           </p>
         </div>
+        <div className="space-y-1">
+          <p className="text-sm text-muted-foreground">Status</p>
+          <span
+            className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${
+              user.emailVerified
+                ? "bg-green-500/10 text-green-700 border border-green-500/20 dark:text-green-400"
+                : "bg-yellow-500/10 text-yellow-700 border border-yellow-500/20 dark:text-yellow-400"
+            }`}
+          >
+            {user.emailVerified ? "Active" : "Invited"}
+          </span>
+        </div>
       </div>
+
+      {hasPendingInvite && (
+        <div className="rounded-xl border bg-card shadow-sm p-6">
+          <h3 className="text-base font-semibold text-foreground mb-1">Pending Invite</h3>
+          <p className="text-sm text-muted-foreground mb-4">
+            This user has not yet accepted their invite. You can resend the invite link.
+          </p>
+          {actionData?.success?.invite && (
+            <div className="rounded-md bg-green-500/10 border border-green-500/20 px-4 py-3 mb-4">
+              <p className="text-sm text-green-700 dark:text-green-400">{actionData.success.invite}</p>
+            </div>
+          )}
+          {actionData?.errors?.invite && (
+            <div className="rounded-md bg-destructive/10 border border-destructive/20 px-4 py-3 mb-4">
+              <p className="text-sm text-destructive">{actionData.errors.invite[0]}</p>
+            </div>
+          )}
+          <Form method="post">
+            <input type="hidden" name="intent" value="resend-invite" />
+            <Button type="submit" variant="outline" disabled={isSubmitting}>
+              {isResending ? <Loader2 className="animate-spin" /> : <Mail />}
+              {isResending ? "Sending..." : "Resend Invite"}
+            </Button>
+          </Form>
+        </div>
+      )}
 
       <div className="rounded-xl border bg-card shadow-sm p-6">
         <Form method="post" className="space-y-6">
@@ -153,7 +173,7 @@ export default function EditUser({ loaderData }: Route.ComponentProps) {
               aria-invalid={actionData?.errors?.name ? true : undefined}
             />
             {actionData?.errors?.name && (
-              <p className="text-sm text-destructive">{actionData.errors.name}</p>
+              <p className="text-sm text-destructive">{actionData.errors.name[0]}</p>
             )}
           </div>
 
@@ -169,7 +189,7 @@ export default function EditUser({ loaderData }: Route.ComponentProps) {
               aria-invalid={actionData?.errors?.email ? true : undefined}
             />
             {actionData?.errors?.email && (
-              <p className="text-sm text-destructive">{actionData.errors.email}</p>
+              <p className="text-sm text-destructive">{actionData.errors.email[0]}</p>
             )}
           </div>
 
@@ -190,43 +210,10 @@ export default function EditUser({ loaderData }: Route.ComponentProps) {
             )}
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="password">New Password (optional)</Label>
-            <Input
-              id="password"
-              name="password"
-              type="password"
-              placeholder="••••••••"
-              minLength={8}
-              aria-invalid={actionData?.errors?.password ? true : undefined}
-            />
-            {actionData?.errors?.password && (
-              <p className="text-sm text-destructive">{actionData.errors.password}</p>
-            )}
-            <p className="text-sm text-muted-foreground">
-              Leave blank to keep current password
-            </p>
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="confirmPassword">Confirm New Password</Label>
-            <Input
-              id="confirmPassword"
-              name="confirmPassword"
-              type="password"
-              placeholder="••••••••"
-              minLength={8}
-              aria-invalid={actionData?.errors?.confirmPassword ? true : undefined}
-            />
-            {actionData?.errors?.confirmPassword && (
-              <p className="text-sm text-destructive">{actionData.errors.confirmPassword}</p>
-            )}
-          </div>
-
           <div className="flex items-center gap-3 pt-4">
             <Button type="submit" disabled={isSubmitting}>
-              {isSubmitting && !isDeleting && <Loader2 className="animate-spin" />}
-              {isSubmitting && !isDeleting ? "Saving..." : "Save Changes"}
+              {isSubmitting && !isDeleting && !isResending && <Loader2 className="animate-spin" />}
+              {isSubmitting && !isDeleting && !isResending ? "Saving..." : "Save Changes"}
             </Button>
             <Button asChild variant="outline" disabled={isSubmitting}>
               <Link to="/admin/users">Cancel</Link>
@@ -250,7 +237,7 @@ export default function EditUser({ loaderData }: Route.ComponentProps) {
         ) : null}
         {actionData?.errors?.delete && (
           <div className="rounded-lg border border-destructive/50 bg-destructive/10 p-4 mb-4">
-            <p className="text-sm text-destructive">{actionData.errors.delete}</p>
+            <p className="text-sm text-destructive">{actionData.errors.delete[0]}</p>
           </div>
         )}
         <Form method="post">

@@ -23,9 +23,26 @@ model User {
   sessions         Session[]
   accounts         Account[]
   twofactors       TwoFactor[]
+  invites          Invite[]
 
   @@unique([email])
   @@map("user")
+}
+
+model Invite {
+  id         String    @id @default(cuid())
+  email      String
+  name       String
+  role       String    @default("user")
+  token      String    @unique
+  userId     String?
+  user       User?     @relation(fields: [userId], references: [id], onDelete: SetNull)
+  expiresAt  DateTime
+  acceptedAt DateTime?
+  createdAt  DateTime  @default(now())
+
+  @@index([token])
+  @@map("invite")
 }
 
 model Session {

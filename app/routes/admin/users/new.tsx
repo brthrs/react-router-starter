@@ -1,10 +1,18 @@
 import { Form, Link, redirect, useActionData, useNavigation } from "react-router";
 import { ArrowLeft, Loader2 } from "lucide-react";
+import { z } from "zod";
 import type { Route } from "./+types/new";
-import { requireAdmin, auth } from "~/lib/auth/server";
+import { requireAdmin } from "~/lib/auth/server";
+import { createUser } from "~/services/user.server";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
+
+const schema = z.object({
+  name: z.string().min(1, "Please enter a name"),
+  email: z.string().email("Please enter a valid email address"),
+  role: z.string().optional(),
+});
 
 export async function loader({ request }: Route.LoaderArgs) {
   await requireAdmin(request);
@@ -15,40 +23,18 @@ export async function action({ request }: Route.ActionArgs) {
   await requireAdmin(request);
 
   const formData = await request.formData();
-  const email = formData.get("email") as string;
-  const name = formData.get("name") as string;
-  const role = formData.get("role") as string;
-  const password = formData.get("password") as string;
-  const confirmPassword = formData.get("confirmPassword") as string;
-
-  const errors: Record<string, string> = {};
-
-  if (!email || !email.includes("@")) {
-    errors.email = "Please enter a valid email address";
-  }
-
-  if (!name || name.trim().length === 0) {
-    errors.name = "Please enter a name";
-  }
-
-  if (!password || password.length < 8) {
-    errors.password = "Password must be at least 8 characters";
-  }
-
-  if (password !== confirmPassword) {
-    errors.confirmPassword = "Passwords do not match";
-  }
-
-  if (Object.keys(errors).length > 0) {
-    return { errors };
-  }
-
-  const validRole = role === "admin" || role === "user" ? role : "user";
-
-  await auth.api.createUser({
-    body: { email, password, name, role: validRole },
-    headers: request.headers,
+  const result = schema.safeParse({
+    name: formData.get("name"),
+    email: formData.get("email"),
+    role: formData.get("role"),
   });
+
+  if (!result.success) {
+    return { errors: result.error.flatten().fieldErrors };
+  }
+
+  const { name, email, role } = result.data;
+  await createUser(name, email, role ?? "user", request.headers);
 
   return redirect("/admin/users?created=true");
 }
@@ -73,7 +59,7 @@ export default function NewUser() {
         </Button>
         <h1 className="text-3xl font-bold tracking-tight text-foreground">Add User</h1>
         <p className="text-muted-foreground mt-1">
-          Create a new user account
+          An invite link will be sent to the user so they can set their own password.
         </p>
       </div>
 
@@ -90,7 +76,7 @@ export default function NewUser() {
               aria-invalid={actionData?.errors?.name ? true : undefined}
             />
             {actionData?.errors?.name && (
-              <p className="text-sm text-destructive">{actionData.errors.name}</p>
+              <p className="text-sm text-destructive">{actionData.errors.name[0]}</p>
             )}
           </div>
 
@@ -105,7 +91,7 @@ export default function NewUser() {
               aria-invalid={actionData?.errors?.email ? true : undefined}
             />
             {actionData?.errors?.email && (
-              <p className="text-sm text-destructive">{actionData.errors.email}</p>
+              <p className="text-sm text-destructive">{actionData.errors.email[0]}</p>
             )}
           </div>
 
@@ -122,45 +108,10 @@ export default function NewUser() {
             </select>
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="password">Password</Label>
-            <Input
-              id="password"
-              name="password"
-              type="password"
-              placeholder="••••••••"
-              required
-              minLength={8}
-              aria-invalid={actionData?.errors?.password ? true : undefined}
-            />
-            {actionData?.errors?.password && (
-              <p className="text-sm text-destructive">{actionData.errors.password}</p>
-            )}
-            <p className="text-sm text-muted-foreground">
-              Must be at least 8 characters long
-            </p>
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="confirmPassword">Confirm Password</Label>
-            <Input
-              id="confirmPassword"
-              name="confirmPassword"
-              type="password"
-              placeholder="••••••••"
-              required
-              minLength={8}
-              aria-invalid={actionData?.errors?.confirmPassword ? true : undefined}
-            />
-            {actionData?.errors?.confirmPassword && (
-              <p className="text-sm text-destructive">{actionData.errors.confirmPassword}</p>
-            )}
-          </div>
-
           <div className="flex items-center gap-3 pt-4">
             <Button type="submit" disabled={isSubmitting}>
               {isSubmitting && <Loader2 className="animate-spin" />}
-              {isSubmitting ? "Creating..." : "Create User"}
+              {isSubmitting ? "Sending invite..." : "Send Invite"}
             </Button>
             <Button asChild variant="outline" disabled={isSubmitting}>
               <Link to="/admin/users">Cancel</Link>
