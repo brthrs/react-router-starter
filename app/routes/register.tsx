@@ -1,5 +1,6 @@
 import { type LoaderFunctionArgs, redirect, Link } from "react-router";
 import { useNavigate } from "react-router";
+import { useTranslation } from "react-i18next";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -36,6 +37,7 @@ const schema = z
 type FormValues = z.infer<typeof schema>;
 
 export default function Register() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [serverError, setServerError] = useState<string | null>(null);
 
@@ -60,14 +62,14 @@ export default function Register() {
     <div className="flex min-h-screen items-center justify-center bg-background px-4">
       <div className="w-full max-w-md space-y-8">
         <div className="text-center">
-          <h1 className="text-4xl font-bold tracking-tight">Create an account</h1>
-          <p className="mt-2 text-muted-foreground">Sign up to get started</p>
+          <h1 className="text-4xl font-bold tracking-tight">{t("auth.register.title")}</h1>
+          <p className="mt-2 text-muted-foreground">{t("auth.register.subtitle")}</p>
         </div>
 
         <div className="bg-card rounded-lg shadow-sm border p-8">
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
             <div className="space-y-2">
-              <Label htmlFor="name">Name</Label>
+              <Label htmlFor="name">{t("common.name")}</Label>
               <Input
                 id="name"
                 type="text"
@@ -84,7 +86,7 @@ export default function Register() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="email">{t("common.email")}</Label>
               <Input
                 id="email"
                 type="email"
@@ -101,7 +103,7 @@ export default function Register() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="password">Password</Label>
+              <Label htmlFor="password">{t("common.password")}</Label>
               <Input
                 id="password"
                 type="password"
@@ -118,7 +120,7 @@ export default function Register() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="confirmPassword">Confirm Password</Label>
+              <Label htmlFor="confirmPassword">{t("common.confirmPassword")}</Label>
               <Input
                 id="confirmPassword"
                 type="password"
@@ -141,15 +143,15 @@ export default function Register() {
             )}
 
             <Button type="submit" className="w-full h-11" disabled={isSubmitting}>
-              {isSubmitting ? "Creating account..." : "Create account"}
+              {isSubmitting ? t("common.signingUp") : t("common.signUp")}
             </Button>
           </form>
         </div>
 
         <p className="text-center text-sm text-muted-foreground">
-          Already have an account?{" "}
+          {t("common.hasAccount")}{" "}
           <Link to="/login" className="font-medium text-foreground underline underline-offset-4">
-            Sign in
+            {t("common.signIn")}
           </Link>
         </p>
       </div>

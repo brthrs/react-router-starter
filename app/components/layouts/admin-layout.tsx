@@ -1,5 +1,7 @@
 import { NavLink, Link } from "react-router";
+import { useTranslation } from "react-i18next";
 import { cn } from "~/lib/utils";
+import { ThemeToggle } from "~/components/theme-toggle";
 
 interface AdminLayoutProps {
   children: React.ReactNode;
@@ -7,11 +9,12 @@ interface AdminLayoutProps {
 }
 
 const navigation = [
-  { name: "Dashboard", href: "/admin", icon: LayoutDashboardIcon },
-  { name: "Users", href: "/admin/users", icon: UsersIcon },
+  { key: "admin.sidebar.dashboard", href: "/admin", icon: LayoutDashboardIcon },
+  { key: "admin.sidebar.users", href: "/admin/users", icon: UsersIcon },
 ];
 
 export function AdminLayout({ children, userEmail }: AdminLayoutProps) {
+  const { t } = useTranslation();
   return (
     <div className="flex min-h-screen bg-background">
       <aside className="fixed inset-y-0 left-0 z-50 w-64 flex flex-col bg-sidebar border-r border-sidebar-border">
@@ -20,15 +23,15 @@ export function AdminLayout({ children, userEmail }: AdminLayoutProps) {
             <CodeIcon className="h-5 w-5 text-sidebar-primary-foreground" />
           </div>
           <div className="flex flex-col">
-            <span className="text-sm font-semibold text-sidebar-foreground">React Router Starter</span>
-            <span className="text-xs text-muted-foreground">Admin</span>
+            <span className="text-sm font-semibold text-sidebar-foreground">{t("admin.sidebar.appName")}</span>
+            <span className="text-xs text-muted-foreground">{t("admin.title")}</span>
           </div>
         </div>
 
         <nav className="flex-1 px-3 py-4 space-y-1">
           {navigation.map((item) => (
             <NavLink
-              key={item.name}
+              key={item.key}
               to={item.href}
               end={item.href === "/admin"}
               className={({ isActive }) =>
@@ -41,30 +44,33 @@ export function AdminLayout({ children, userEmail }: AdminLayoutProps) {
               }
             >
               <item.icon className="h-5 w-5" />
-              {item.name}
+              {t(item.key)}
             </NavLink>
           ))}
         </nav>
 
         <div className="border-t border-sidebar-border p-4 space-y-1">
-          <Link
-            to="/profile"
-            className="flex items-center gap-3 rounded-lg px-3 py-2 hover:bg-sidebar-accent/50 transition-colors"
-          >
-            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-sidebar-accent">
-              <UserIcon className="h-4 w-4 text-sidebar-foreground" />
-            </div>
-            <p className="text-sm font-medium text-sidebar-foreground truncate">
-              {userEmail || "User"}
-            </p>
-          </Link>
+          <div className="flex items-center justify-between px-3 py-1">
+            <Link
+              to="/profile"
+              className="flex items-center gap-3 rounded-lg hover:bg-sidebar-accent/50 transition-colors min-w-0"
+            >
+              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-sidebar-accent">
+                <UserIcon className="h-4 w-4 text-sidebar-foreground" />
+              </div>
+              <p className="text-sm font-medium text-sidebar-foreground truncate">
+                {userEmail || "User"}
+              </p>
+            </Link>
+            <ThemeToggle />
+          </div>
           <form action="/logout" method="post">
             <button
               type="submit"
               className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm text-sidebar-foreground/70 hover:bg-sidebar-accent/50 hover:text-sidebar-foreground transition-colors"
             >
               <LogOutIcon className="h-4 w-4" />
-              Sign out
+              {t("common.signOut")}
             </button>
           </form>
         </div>

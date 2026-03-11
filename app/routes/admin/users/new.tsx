@@ -1,5 +1,6 @@
 import { Form, Link, redirect, useActionData, useNavigation } from "react-router";
 import { ArrowLeft, Loader2 } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import { z } from "zod";
 import type { Route } from "./+types/new";
 import { requireAdmin } from "~/lib/auth/server";
@@ -44,6 +45,7 @@ export function meta(_args: Route.MetaArgs) {
 }
 
 export default function NewUser() {
+  const { t } = useTranslation();
   const actionData = useActionData<typeof action>();
   const navigation = useNavigation();
   const isSubmitting = navigation.state === "submitting";
@@ -54,19 +56,19 @@ export default function NewUser() {
         <Button asChild variant="ghost" size="sm" className="mb-4">
           <Link to="/admin/users">
             <ArrowLeft />
-            Back to Users
+            {t("admin.newUser.backToUsers")}
           </Link>
         </Button>
-        <h1 className="text-3xl font-bold tracking-tight text-foreground">Add User</h1>
+        <h1 className="text-3xl font-bold tracking-tight text-foreground">{t("admin.newUser.title")}</h1>
         <p className="text-muted-foreground mt-1">
-          An invite link will be sent to the user so they can set their own password.
+          {t("admin.newUser.subtitle")}
         </p>
       </div>
 
       <div className="rounded-xl border bg-card shadow-sm p-6">
         <Form method="post" className="space-y-6">
           <div className="space-y-2">
-            <Label htmlFor="name">Name</Label>
+            <Label htmlFor="name">{t("common.name")}</Label>
             <Input
               id="name"
               name="name"
@@ -81,7 +83,7 @@ export default function NewUser() {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="email">Email</Label>
+            <Label htmlFor="email">{t("common.email")}</Label>
             <Input
               id="email"
               name="email"
@@ -96,25 +98,25 @@ export default function NewUser() {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="role">Role</Label>
+            <Label htmlFor="role">{t("common.role")}</Label>
             <select
               id="role"
               name="role"
               defaultValue="user"
               className="flex h-11 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
             >
-              <option value="user">User</option>
-              <option value="admin">Admin</option>
+              <option value="user">{t("common.user")}</option>
+              <option value="admin">{t("common.admin")}</option>
             </select>
           </div>
 
           <div className="flex items-center gap-3 pt-4">
             <Button type="submit" disabled={isSubmitting}>
               {isSubmitting && <Loader2 className="animate-spin" />}
-              {isSubmitting ? "Sending invite..." : "Send Invite"}
+              {isSubmitting ? t("admin.newUser.sendingInvite") : t("admin.newUser.sendInvite")}
             </Button>
             <Button asChild variant="outline" disabled={isSubmitting}>
-              <Link to="/admin/users">Cancel</Link>
+              <Link to="/admin/users">{t("common.cancel")}</Link>
             </Button>
           </div>
         </Form>

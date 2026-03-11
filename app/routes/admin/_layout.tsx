@@ -2,6 +2,7 @@ import { Outlet, useLoaderData } from "react-router";
 import type { Route } from "./+types/_layout";
 import { requireAdmin } from "~/lib/auth/server";
 import { AdminLayout } from "~/components/layouts/admin-layout";
+import { RouteErrorBoundary } from "~/components/route-error-boundary";
 
 export async function loader({ request }: Route.LoaderArgs) {
   const session = await requireAdmin(request);
@@ -21,3 +22,5 @@ export default function Admin() {
     </AdminLayout>
   );
 }
+
+export { RouteErrorBoundary as ErrorBoundary };

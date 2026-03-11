@@ -1,6 +1,7 @@
 import { type LoaderFunctionArgs, redirect } from "react-router";
 import { useNavigate } from "react-router";
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import type { Route } from "./+types/two-factor";
 import { auth } from "~/lib/auth/server";
 import { authClient } from "~/lib/auth/client";
@@ -21,6 +22,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
 type Tab = "totp" | "otp" | "backup";
 
 export default function TwoFactor() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [tab, setTab] = useState<Tab>("totp");
   const [code, setCode] = useState("");
@@ -85,18 +87,18 @@ export default function TwoFactor() {
   };
 
   const tabs: { id: Tab; label: string }[] = [
-    { id: "totp", label: "Authenticator app" },
-    { id: "otp", label: "Email code" },
-    { id: "backup", label: "Backup code" },
+    { id: "totp", label: t("auth.twoFactor.authenticatorApp") },
+    { id: "otp", label: t("auth.twoFactor.emailCode") },
+    { id: "backup", label: t("auth.twoFactor.backupCode") },
   ];
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-background px-4">
       <div className="w-full max-w-md space-y-8">
         <div className="text-center">
-          <h1 className="text-4xl font-bold tracking-tight">Two-factor authentication</h1>
+          <h1 className="text-4xl font-bold tracking-tight">{t("auth.twoFactor.title")}</h1>
           <p className="mt-2 text-muted-foreground">
-            Verify your identity to continue.
+            {t("auth.twoFactor.subtitle")}
           </p>
         </div>
 
@@ -122,10 +124,10 @@ export default function TwoFactor() {
             {tab === "totp" && (
               <form onSubmit={handleTotpSubmit} className="space-y-6">
                 <p className="text-sm text-muted-foreground">
-                  Open your authenticator app and enter the 6-digit code.
+                  {t("auth.twoFactor.totpDescription")}
                 </p>
                 <div className="space-y-2">
-                  <Label htmlFor="totp-code">Authentication code</Label>
+                  <Label htmlFor="totp-code">{t("auth.twoFactor.authenticationCode")}</Label>
                   <Input
                     id="totp-code"
                     type="text"
@@ -146,7 +148,7 @@ export default function TwoFactor() {
                   </div>
                 )}
                 <Button type="submit" className="w-full h-11" disabled={isSubmitting || code.length !== 6}>
-                  {isSubmitting ? "Verifying..." : "Verify"}
+                  {isSubmitting ? t("common.verifying") : t("common.verify")}
                 </Button>
               </form>
             )}
@@ -154,7 +156,7 @@ export default function TwoFactor() {
             {tab === "otp" && (
               <div className="space-y-6">
                 <p className="text-sm text-muted-foreground">
-                  We'll send a one-time code to your email address.
+                  {t("auth.twoFactor.otpDescription")}
                 </p>
                 {!otpSent ? (
                   <>
@@ -169,13 +171,13 @@ export default function TwoFactor() {
                       onClick={handleSendOtp}
                       disabled={isSendingOtp}
                     >
-                      {isSendingOtp ? "Sending..." : "Send code to email"}
+                      {isSendingOtp ? t("common.sending") : t("auth.twoFactor.sendCodeToEmail")}
                     </Button>
                   </>
                 ) : (
                   <form onSubmit={handleOtpSubmit} className="space-y-6">
                     <div className="space-y-2">
-                      <Label htmlFor="otp-code">Email code</Label>
+                      <Label htmlFor="otp-code">{t("auth.twoFactor.emailCode")}</Label>
                       <Input
                         id="otp-code"
                         type="text"
@@ -197,7 +199,7 @@ export default function TwoFactor() {
                     )}
                     <div className="flex gap-2">
                       <Button type="submit" className="flex-1 h-11" disabled={isSubmitting || code.length !== 6}>
-                        {isSubmitting ? "Verifying..." : "Verify"}
+                        {isSubmitting ? t("common.verifying") : t("common.verify")}
                       </Button>
                       <Button
                         type="button"
@@ -206,7 +208,7 @@ export default function TwoFactor() {
                         onClick={() => { setOtpSent(false); setCode(""); setError(null); }}
                         disabled={isSubmitting}
                       >
-                        Resend
+                        {t("auth.twoFactor.resend")}
                       </Button>
                     </div>
                   </form>
@@ -217,10 +219,10 @@ export default function TwoFactor() {
             {tab === "backup" && (
               <form onSubmit={handleBackupSubmit} className="space-y-6">
                 <p className="text-sm text-muted-foreground">
-                  Enter one of your backup codes. Each code can only be used once.
+                  {t("auth.twoFactor.backupDescription")}
                 </p>
                 <div className="space-y-2">
-                  <Label htmlFor="backup-code">Backup code</Label>
+                  <Label htmlFor="backup-code">{t("auth.twoFactor.backupCode")}</Label>
                   <Input
                     id="backup-code"
                     type="text"
@@ -238,7 +240,7 @@ export default function TwoFactor() {
                   </div>
                 )}
                 <Button type="submit" className="w-full h-11" disabled={isSubmitting || !code.trim()}>
-                  {isSubmitting ? "Verifying..." : "Verify"}
+                  {isSubmitting ? t("common.verifying") : t("common.verify")}
                 </Button>
               </form>
             )}

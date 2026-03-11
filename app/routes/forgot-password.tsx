@@ -1,4 +1,5 @@
 import { type LoaderFunctionArgs, redirect, Link } from "react-router";
+import { useTranslation } from "react-i18next";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -27,6 +28,7 @@ const schema = z.object({
 type FormValues = z.infer<typeof schema>;
 
 export default function ForgotPassword() {
+  const { t } = useTranslation();
   const [sent, setSent] = useState(false);
   const [serverError, setServerError] = useState<string | null>(null);
 
@@ -53,15 +55,15 @@ export default function ForgotPassword() {
     return (
       <div className="flex min-h-screen items-center justify-center bg-background px-4">
         <div className="w-full max-w-md space-y-8 text-center">
-          <h1 className="text-4xl font-bold tracking-tight">Check your email</h1>
+          <h1 className="text-4xl font-bold tracking-tight">{t("auth.forgotPassword.checkEmail")}</h1>
           <p className="text-muted-foreground">
-            If an account exists for that email address, we've sent a password reset link.
+            {t("auth.forgotPassword.checkEmailDescription")}
           </p>
           <Link
             to="/login"
             className="inline-block text-sm font-medium text-foreground underline underline-offset-4"
           >
-            Back to sign in
+            {t("common.backToSignIn")}
           </Link>
         </div>
       </div>
@@ -72,16 +74,16 @@ export default function ForgotPassword() {
     <div className="flex min-h-screen items-center justify-center bg-background px-4">
       <div className="w-full max-w-md space-y-8">
         <div className="text-center">
-          <h1 className="text-4xl font-bold tracking-tight">Forgot your password?</h1>
+          <h1 className="text-4xl font-bold tracking-tight">{t("auth.forgotPassword.title")}</h1>
           <p className="mt-2 text-muted-foreground">
-            Enter your email and we'll send you a reset link.
+            {t("auth.forgotPassword.subtitle")}
           </p>
         </div>
 
         <div className="bg-card rounded-lg shadow-sm border p-8">
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
             <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="email">{t("common.email")}</Label>
               <Input
                 id="email"
                 type="email"
@@ -104,15 +106,15 @@ export default function ForgotPassword() {
             )}
 
             <Button type="submit" className="w-full h-11" disabled={isSubmitting}>
-              {isSubmitting ? "Sending..." : "Send reset link"}
+              {isSubmitting ? t("common.sending") : t("auth.forgotPassword.sendResetLink")}
             </Button>
           </form>
         </div>
 
         <p className="text-center text-sm text-muted-foreground">
-          Remember your password?{" "}
+          {t("auth.forgotPassword.rememberPassword")}{" "}
           <Link to="/login" className="font-medium text-foreground underline underline-offset-4">
-            Sign in
+            {t("common.signIn")}
           </Link>
         </p>
       </div>

@@ -12,6 +12,7 @@ import {
 import type { Route } from "./+types/root";
 import "./app.css";
 import { Toaster } from "./components/ui/sonner";
+import { NavigationProgress } from "./components/navigation-progress";
 import "~/lib/i18n";
 
 export const links: Route.LinksFunction = () => [
@@ -27,13 +28,22 @@ export const links: Route.LinksFunction = () => [
   },
 ];
 
+const themeScript = `
+(function(){
+  var t = localStorage.getItem("theme");
+  var d = t === "dark" || (!t || t === "system") && window.matchMedia("(prefers-color-scheme: dark)").matches;
+  if (d) document.documentElement.classList.add("dark");
+})();
+`;
+
 export function Layout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <head>
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
         <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+        <script dangerouslySetInnerHTML={{ __html: themeScript }} />
         <Meta />
         <Links />
       </head>
@@ -51,6 +61,7 @@ export default function App() {
   const [queryClient] = useState(() => new QueryClient());
   return (
     <QueryClientProvider client={queryClient}>
+      <NavigationProgress />
       <Outlet />
     </QueryClientProvider>
   );

@@ -1,6 +1,7 @@
 import { Link, useSearchParams } from "react-router";
 import { Plus, Search, ChevronLeft, ChevronRight } from "lucide-react";
 import { useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import type { Route } from "./+types/index";
 import { requireAdmin } from "~/lib/auth/server";
@@ -29,6 +30,7 @@ export function meta(_args: Route.MetaArgs) {
 type LoaderData = Awaited<ReturnType<typeof loader>>;
 
 export default function Users({ loaderData }: Route.ComponentProps) {
+  const { t } = useTranslation();
   const [searchParams, setSearchParams] = useSearchParams();
   const { users, pagination, searchQuery } = loaderData as unknown as LoaderData;
 
@@ -76,15 +78,15 @@ export default function Users({ loaderData }: Route.ComponentProps) {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight text-foreground">Users</h1>
+          <h1 className="text-3xl font-bold tracking-tight text-foreground">{t("admin.users.title")}</h1>
           <p className="text-muted-foreground mt-1">
-            Manage user accounts and permissions
+            {t("admin.users.subtitle")}
           </p>
         </div>
         <Button asChild>
           <Link to="/admin/users/new">
             <Plus />
-            Add User
+            {t("admin.newUser.title")}
           </Link>
         </Button>
       </div>
@@ -95,13 +97,13 @@ export default function Users({ loaderData }: Route.ComponentProps) {
           <Input
             type="search"
             name="search"
-            placeholder="Search by email..."
+            placeholder={t("admin.users.searchPlaceholder")}
             defaultValue={searchQuery}
             className="pl-9"
           />
         </div>
         <Button type="submit" variant="outline">
-          Search
+          {t("common.search")}
         </Button>
       </form>
 
@@ -111,22 +113,22 @@ export default function Users({ loaderData }: Route.ComponentProps) {
             <thead>
               <tr className="border-b bg-muted/50">
                 <th className="px-6 py-3 text-left text-sm font-medium text-foreground">
-                  Email
+                  {t("common.email")}
                 </th>
                 <th className="px-6 py-3 text-left text-sm font-medium text-foreground">
-                  Name
+                  {t("common.name")}
                 </th>
                 <th className="px-6 py-3 text-left text-sm font-medium text-foreground">
-                  Role
+                  {t("common.role")}
                 </th>
                 <th className="px-6 py-3 text-left text-sm font-medium text-foreground">
-                  Status
+                  {t("common.status")}
                 </th>
                 <th className="px-6 py-3 text-left text-sm font-medium text-foreground">
-                  Created At
+                  {t("common.createdAt")}
                 </th>
                 <th className="px-6 py-3 text-right text-sm font-medium text-foreground">
-                  Actions
+                  {t("common.actions")}
                 </th>
               </tr>
             </thead>
@@ -134,7 +136,7 @@ export default function Users({ loaderData }: Route.ComponentProps) {
               {users.length === 0 ? (
                 <tr>
                   <td colSpan={6} className="px-6 py-12 text-center text-muted-foreground">
-                    {searchQuery ? "No users found matching your search" : "No users yet"}
+                    {searchQuery ? t("admin.users.noUsersFound") : t("admin.users.noUsersYet")}
                   </td>
                 </tr>
               ) : (
@@ -158,7 +160,7 @@ export default function Users({ loaderData }: Route.ComponentProps) {
                             : "bg-muted text-muted-foreground border border-border"
                         }`}
                       >
-                        {user.role === "admin" ? "Admin" : "User"}
+                        {user.role === "admin" ? t("common.admin") : t("common.user")}
                       </span>
                     </td>
                     <td className="px-6 py-4">
@@ -169,7 +171,7 @@ export default function Users({ loaderData }: Route.ComponentProps) {
                             : "bg-yellow-500/10 text-yellow-700 border border-yellow-500/20 dark:text-yellow-400"
                         }`}
                       >
-                        {user.emailVerified ? "Active" : "Invited"}
+                        {user.emailVerified ? t("common.active") : t("common.invited")}
                       </span>
                     </td>
                     <td className="px-6 py-4">
@@ -183,7 +185,7 @@ export default function Users({ loaderData }: Route.ComponentProps) {
                     </td>
                     <td className="px-6 py-4 text-right">
                       <Button asChild variant="ghost" size="sm">
-                        <Link to={`/admin/users/${user.id}`}>Edit</Link>
+                        <Link to={`/admin/users/${user.id}`}>{t("common.edit")}</Link>
                       </Button>
                     </td>
                   </tr>
@@ -196,9 +198,11 @@ export default function Users({ loaderData }: Route.ComponentProps) {
         {pagination.totalPages > 1 && (
           <div className="flex items-center justify-between border-t px-6 py-3">
             <div className="text-sm text-muted-foreground">
-              Showing {(pagination.currentPage - 1) * ITEMS_PER_PAGE + 1} to{" "}
-              {Math.min(pagination.currentPage * ITEMS_PER_PAGE, pagination.totalCount)} of{" "}
-              {pagination.totalCount} users
+              {t("admin.users.showingRange", {
+                from: (pagination.currentPage - 1) * ITEMS_PER_PAGE + 1,
+                to: Math.min(pagination.currentPage * ITEMS_PER_PAGE, pagination.totalCount),
+                total: pagination.totalCount,
+              })}
             </div>
             <div className="flex items-center gap-2">
               <Button
@@ -208,10 +212,10 @@ export default function Users({ loaderData }: Route.ComponentProps) {
                 disabled={!pagination.hasPreviousPage}
               >
                 <ChevronLeft />
-                Previous
+                {t("common.previous")}
               </Button>
               <div className="text-sm text-muted-foreground">
-                Page {pagination.currentPage} of {pagination.totalPages}
+                {t("admin.users.pageOf", { current: pagination.currentPage, total: pagination.totalPages })}
               </div>
               <Button
                 variant="outline"
@@ -219,7 +223,7 @@ export default function Users({ loaderData }: Route.ComponentProps) {
                 onClick={() => goToPage(pagination.currentPage + 1)}
                 disabled={!pagination.hasNextPage}
               >
-                Next
+                {t("common.next")}
                 <ChevronRight />
               </Button>
             </div>

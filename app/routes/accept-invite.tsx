@@ -1,4 +1,5 @@
 import { Form, Link, redirect, useActionData, useLoaderData, useNavigation } from "react-router";
+import { useTranslation } from "react-i18next";
 import { Loader2 } from "lucide-react";
 import { z } from "zod";
 import type { Route } from "./+types/accept-invite";
@@ -64,6 +65,7 @@ export async function action({ request }: Route.ActionArgs) {
 }
 
 export default function AcceptInvite() {
+  const { t } = useTranslation();
   const { name, email, token } = useLoaderData<typeof loader>();
   const actionData = useActionData<typeof action>();
   const navigation = useNavigation();
@@ -73,9 +75,9 @@ export default function AcceptInvite() {
     <div className="flex min-h-screen items-center justify-center bg-background px-4">
       <div className="w-full max-w-md space-y-8">
         <div className="text-center">
-          <h1 className="text-4xl font-bold tracking-tight">Set up your account</h1>
+          <h1 className="text-4xl font-bold tracking-tight">{t("auth.acceptInvite.title")}</h1>
           <p className="mt-2 text-muted-foreground">
-            Welcome, {name}. Choose a password to activate your account.
+            {t("auth.acceptInvite.subtitle", { name })}
           </p>
         </div>
 
@@ -90,18 +92,18 @@ export default function AcceptInvite() {
             <input type="hidden" name="token" value={token} />
 
             <div className="space-y-2">
-              <label className="text-sm font-medium text-foreground">Name</label>
+              <label className="text-sm font-medium text-foreground">{t("common.name")}</label>
               <Input value={name} disabled className="h-11 opacity-60" readOnly />
             </div>
 
             <div className="space-y-2">
-              <label className="text-sm font-medium text-foreground">Email</label>
+              <label className="text-sm font-medium text-foreground">{t("common.email")}</label>
               <Input value={email} disabled className="h-11 opacity-60" readOnly />
             </div>
 
             <div className="space-y-2">
               <label htmlFor="password" className="text-sm font-medium text-foreground">
-                Password
+                {t("common.password")}
               </label>
               <Input
                 id="password"
@@ -117,12 +119,12 @@ export default function AcceptInvite() {
               {actionData?.errors?.password && (
                 <p className="text-sm text-destructive">{actionData.errors.password[0]}</p>
               )}
-              <p className="text-sm text-muted-foreground">Must be at least 8 characters long</p>
+              <p className="text-sm text-muted-foreground">{t("auth.acceptInvite.passwordHint")}</p>
             </div>
 
             <div className="space-y-2">
               <label htmlFor="confirmPassword" className="text-sm font-medium text-foreground">
-                Confirm Password
+                {t("common.confirmPassword")}
               </label>
               <Input
                 id="confirmPassword"
@@ -142,15 +144,15 @@ export default function AcceptInvite() {
 
             <Button type="submit" className="w-full h-11" disabled={isSubmitting}>
               {isSubmitting && <Loader2 className="animate-spin" />}
-              {isSubmitting ? "Activating account..." : "Activate account"}
+              {isSubmitting ? t("auth.acceptInvite.activating") : t("auth.acceptInvite.activateAccount")}
             </Button>
           </Form>
         </div>
 
         <p className="text-center text-sm text-muted-foreground">
-          Already have an account?{" "}
+          {t("common.hasAccount")}{" "}
           <Link to="/login" className="font-medium text-foreground underline underline-offset-4">
-            Sign in
+            {t("common.signIn")}
           </Link>
         </p>
       </div>

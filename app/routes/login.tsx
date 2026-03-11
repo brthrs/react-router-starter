@@ -1,6 +1,7 @@
 import { type LoaderFunctionArgs, redirect, Link } from "react-router";
 import { useNavigate, useSearchParams } from "react-router";
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -32,18 +33,21 @@ export async function loader({ request }: LoaderFunctionArgs) {
 }
 
 export default function Login() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const [serverError, setServerError] = useState<string | null>(null);
 
   const successMessage =
     searchParams.get("registered") === "true"
-      ? "Account created! Please check your email to verify your address."
+      ? t("auth.login.registered")
       : searchParams.get("verified") === "true"
-        ? "Email verified! You can now sign in."
+        ? t("auth.login.verified")
         : searchParams.get("invited") === "true"
-          ? "Account activated! You can now sign in."
-          : null;
+          ? t("auth.login.inviteAccepted")
+          : searchParams.get("deleted") === "true"
+            ? t("auth.login.accountDeleted")
+            : null;
 
   const {
     register,
@@ -71,9 +75,9 @@ export default function Login() {
     <div className="flex min-h-screen items-center justify-center bg-background px-4">
       <div className="w-full max-w-md space-y-8">
         <div className="text-center">
-          <h1 className="text-4xl font-bold tracking-tight">Sign in</h1>
+          <h1 className="text-4xl font-bold tracking-tight">{t("auth.login.title")}</h1>
           <p className="mt-2 text-muted-foreground">
-            Enter your credentials to access your account
+            {t("auth.login.subtitle")}
           </p>
         </div>
 
@@ -86,7 +90,7 @@ export default function Login() {
 
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
             <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="email">{t("common.email")}</Label>
               <Input
                 id="email"
                 type="email"
@@ -104,12 +108,12 @@ export default function Login() {
 
             <div className="space-y-2">
               <div className="flex items-center justify-between">
-                <Label htmlFor="password">Password</Label>
+                <Label htmlFor="password">{t("common.password")}</Label>
                 <Link
                   to="/forgot-password"
                   className="text-sm text-muted-foreground hover:text-foreground"
                 >
-                  Forgot password?
+                  {t("common.forgotPassword")}
                 </Link>
               </div>
               <Input
@@ -138,15 +142,15 @@ export default function Login() {
               className="w-full h-11"
               disabled={isSubmitting}
             >
-              {isSubmitting ? "Signing in..." : "Sign in"}
+              {isSubmitting ? t("common.signingIn") : t("common.signIn")}
             </Button>
           </form>
         </div>
 
         <p className="text-center text-sm text-muted-foreground">
-          Don't have an account?{" "}
+          {t("common.noAccount")}{" "}
           <Link to="/register" className="font-medium text-foreground underline underline-offset-4">
-            Create one
+            {t("common.createOne")}
           </Link>
         </p>
       </div>

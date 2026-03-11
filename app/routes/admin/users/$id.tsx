@@ -1,5 +1,6 @@
 import { Form, Link, redirect, useActionData, useNavigation } from "react-router";
 import { ArrowLeft, Loader2, Mail, Trash2 } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import { z } from "zod";
 import type { Route } from "./+types/$id";
 import { requireAdmin } from "~/lib/auth/server";
@@ -79,6 +80,7 @@ export function meta({ data }: Route.MetaArgs) {
 }
 
 export default function EditUser({ loaderData }: Route.ComponentProps) {
+  const { t } = useTranslation();
   const { user, currentUserId, hasPendingInvite } = loaderData;
   const actionData = useActionData<typeof action>();
   const navigation = useNavigation();
@@ -93,22 +95,22 @@ export default function EditUser({ loaderData }: Route.ComponentProps) {
         <Button asChild variant="ghost" size="sm" className="mb-4">
           <Link to="/admin/users">
             <ArrowLeft />
-            Back to Users
+            {t("admin.editUser.backToUsers")}
           </Link>
         </Button>
-        <h1 className="text-3xl font-bold tracking-tight text-foreground">Edit User</h1>
+        <h1 className="text-3xl font-bold tracking-tight text-foreground">{t("admin.editUser.title")}</h1>
         <p className="text-muted-foreground mt-1">
-          Update user account details
+          {t("admin.editUser.subtitle")}
         </p>
       </div>
 
       <div className="rounded-xl border bg-card shadow-sm p-6">
         <div className="space-y-1 mb-6">
-          <p className="text-sm text-muted-foreground">User ID</p>
+          <p className="text-sm text-muted-foreground">{t("admin.editUser.userId")}</p>
           <p className="font-mono text-sm">{user.id}</p>
         </div>
         <div className="space-y-1 mb-6">
-          <p className="text-sm text-muted-foreground">Created</p>
+          <p className="text-sm text-muted-foreground">{t("admin.editUser.created")}</p>
           <p className="text-sm">
             {new Date(user.createdAt).toLocaleDateString("en-US", {
               year: "numeric",
@@ -120,7 +122,7 @@ export default function EditUser({ loaderData }: Route.ComponentProps) {
           </p>
         </div>
         <div className="space-y-1">
-          <p className="text-sm text-muted-foreground">Status</p>
+          <p className="text-sm text-muted-foreground">{t("common.status")}</p>
           <span
             className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${
               user.emailVerified
@@ -128,16 +130,16 @@ export default function EditUser({ loaderData }: Route.ComponentProps) {
                 : "bg-yellow-500/10 text-yellow-700 border border-yellow-500/20 dark:text-yellow-400"
             }`}
           >
-            {user.emailVerified ? "Active" : "Invited"}
+            {user.emailVerified ? t("common.active") : t("common.invited")}
           </span>
         </div>
       </div>
 
       {hasPendingInvite && (
         <div className="rounded-xl border bg-card shadow-sm p-6">
-          <h3 className="text-base font-semibold text-foreground mb-1">Pending Invite</h3>
+          <h3 className="text-base font-semibold text-foreground mb-1">{t("admin.editUser.pendingInvite")}</h3>
           <p className="text-sm text-muted-foreground mb-4">
-            This user has not yet accepted their invite. You can resend the invite link.
+            {t("admin.editUser.pendingInviteDescription")}
           </p>
           {actionData?.success?.invite && (
             <div className="rounded-md bg-green-500/10 border border-green-500/20 px-4 py-3 mb-4">
@@ -153,7 +155,7 @@ export default function EditUser({ loaderData }: Route.ComponentProps) {
             <input type="hidden" name="intent" value="resend-invite" />
             <Button type="submit" variant="outline" disabled={isSubmitting}>
               {isResending ? <Loader2 className="animate-spin" /> : <Mail />}
-              {isResending ? "Sending..." : "Resend Invite"}
+              {isResending ? t("admin.editUser.resending") : t("admin.editUser.resendInvite")}
             </Button>
           </Form>
         </div>
@@ -162,7 +164,7 @@ export default function EditUser({ loaderData }: Route.ComponentProps) {
       <div className="rounded-xl border bg-card shadow-sm p-6">
         <Form method="post" className="space-y-6">
           <div className="space-y-2">
-            <Label htmlFor="name">Name</Label>
+            <Label htmlFor="name">{t("common.name")}</Label>
             <Input
               id="name"
               name="name"
@@ -178,7 +180,7 @@ export default function EditUser({ loaderData }: Route.ComponentProps) {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="email">Email</Label>
+            <Label htmlFor="email">{t("common.email")}</Label>
             <Input
               id="email"
               name="email"
@@ -194,7 +196,7 @@ export default function EditUser({ loaderData }: Route.ComponentProps) {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="role">Role</Label>
+            <Label htmlFor="role">{t("common.role")}</Label>
             <select
               id="role"
               name="role"
@@ -202,36 +204,35 @@ export default function EditUser({ loaderData }: Route.ComponentProps) {
               disabled={isSelf}
               className="flex h-11 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              <option value="user">User</option>
-              <option value="admin">Admin</option>
+              <option value="user">{t("common.user")}</option>
+              <option value="admin">{t("common.admin")}</option>
             </select>
             {isSelf && (
-              <p className="text-xs text-muted-foreground">You cannot change your own role.</p>
+              <p className="text-xs text-muted-foreground">{t("admin.editUser.cannotChangeOwnRole")}</p>
             )}
           </div>
 
           <div className="flex items-center gap-3 pt-4">
             <Button type="submit" disabled={isSubmitting}>
               {isSubmitting && !isDeleting && !isResending && <Loader2 className="animate-spin" />}
-              {isSubmitting && !isDeleting && !isResending ? "Saving..." : "Save Changes"}
+              {isSubmitting && !isDeleting && !isResending ? t("common.saving") : t("common.save")}
             </Button>
             <Button asChild variant="outline" disabled={isSubmitting}>
-              <Link to="/admin/users">Cancel</Link>
+              <Link to="/admin/users">{t("common.cancel")}</Link>
             </Button>
           </div>
         </Form>
       </div>
 
       <div className="rounded-xl border border-destructive/50 bg-destructive/5 shadow-sm p-6">
-        <h3 className="text-lg font-semibold text-foreground mb-2">Danger Zone</h3>
+        <h3 className="text-lg font-semibold text-foreground mb-2">{t("admin.editUser.dangerZone")}</h3>
         <p className="text-sm text-muted-foreground mb-4">
-          Once you delete a user, there is no going back. Please be certain.
+          {t("admin.editUser.deleteWarning")}
         </p>
         {isSelf ? (
           <div className="rounded-lg border border-amber-500/50 bg-amber-500/10 p-4 mb-4">
             <p className="text-sm text-amber-700 dark:text-amber-400">
-              You cannot delete your own account. Please ask another administrator to delete your
-              account if needed.
+              {t("admin.editUser.cannotDeleteSelf")}
             </p>
           </div>
         ) : null}
@@ -249,7 +250,7 @@ export default function EditUser({ loaderData }: Route.ComponentProps) {
             onClick={(e) => {
               if (
                 !confirm(
-                  `Are you sure you want to delete ${user.email}? This action cannot be undone.`
+                  t("admin.editUser.confirmDelete", { email: user.email })
                 )
               ) {
                 e.preventDefault();
@@ -258,7 +259,7 @@ export default function EditUser({ loaderData }: Route.ComponentProps) {
           >
             {isDeleting && <Loader2 className="animate-spin" />}
             <Trash2 />
-            {isDeleting ? "Deleting..." : "Delete User"}
+            {isDeleting ? t("common.deleting") : t("admin.editUser.deleteUser")}
           </Button>
         </Form>
       </div>

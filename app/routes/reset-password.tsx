@@ -1,4 +1,5 @@
 import { Link, useSearchParams } from "react-router";
+import { useTranslation } from "react-i18next";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -26,6 +27,7 @@ const schema = z
 type FormValues = z.infer<typeof schema>;
 
 export default function ResetPassword() {
+  const { t } = useTranslation();
   const [searchParams] = useSearchParams();
   const token = searchParams.get("token") ?? "";
   const [done, setDone] = useState(false);
@@ -54,10 +56,10 @@ export default function ResetPassword() {
     return (
       <div className="flex min-h-screen items-center justify-center bg-background px-4">
         <div className="w-full max-w-md text-center space-y-4">
-          <h1 className="text-2xl font-bold">Invalid reset link</h1>
-          <p className="text-muted-foreground">This password reset link is invalid or has expired.</p>
+          <h1 className="text-2xl font-bold">{t("auth.resetPassword.invalidLink")}</h1>
+          <p className="text-muted-foreground">{t("auth.resetPassword.invalidLinkDescription")}</p>
           <Link to="/forgot-password" className="text-sm font-medium text-foreground underline underline-offset-4">
-            Request a new link
+            {t("auth.resetPassword.requestNewLink")}
           </Link>
         </div>
       </div>
@@ -68,10 +70,10 @@ export default function ResetPassword() {
     return (
       <div className="flex min-h-screen items-center justify-center bg-background px-4">
         <div className="w-full max-w-md text-center space-y-4">
-          <h1 className="text-2xl font-bold">Password updated</h1>
-          <p className="text-muted-foreground">Your password has been reset successfully.</p>
+          <h1 className="text-2xl font-bold">{t("auth.resetPassword.passwordUpdated")}</h1>
+          <p className="text-muted-foreground">{t("auth.resetPassword.passwordUpdatedDescription")}</p>
           <Link to="/login" className="text-sm font-medium text-foreground underline underline-offset-4">
-            Sign in with your new password
+            {t("auth.resetPassword.signInWithNewPassword")}
           </Link>
         </div>
       </div>
@@ -82,14 +84,14 @@ export default function ResetPassword() {
     <div className="flex min-h-screen items-center justify-center bg-background px-4">
       <div className="w-full max-w-md space-y-8">
         <div className="text-center">
-          <h1 className="text-4xl font-bold tracking-tight">Reset your password</h1>
-          <p className="mt-2 text-muted-foreground">Enter your new password below.</p>
+          <h1 className="text-4xl font-bold tracking-tight">{t("auth.resetPassword.title")}</h1>
+          <p className="mt-2 text-muted-foreground">{t("auth.resetPassword.subtitle")}</p>
         </div>
 
         <div className="bg-card rounded-lg shadow-sm border p-8">
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
             <div className="space-y-2">
-              <Label htmlFor="password">New Password</Label>
+              <Label htmlFor="password">{t("common.newPassword")}</Label>
               <Input
                 id="password"
                 type="password"
@@ -106,7 +108,7 @@ export default function ResetPassword() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="confirmPassword">Confirm New Password</Label>
+              <Label htmlFor="confirmPassword">{t("common.confirmNewPassword")}</Label>
               <Input
                 id="confirmPassword"
                 type="password"
@@ -129,7 +131,7 @@ export default function ResetPassword() {
             )}
 
             <Button type="submit" className="w-full h-11" disabled={isSubmitting}>
-              {isSubmitting ? "Updating..." : "Update password"}
+              {isSubmitting ? t("common.updating") : t("auth.resetPassword.updatePassword")}
             </Button>
           </form>
         </div>
