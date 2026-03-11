@@ -1,4 +1,13 @@
-.react-router
-build
 node_modules
-README.md
+build
+.env
+.env.local
+.git
+.gitignore
+*.md
+.cursor
+docs
+scripts
+test-results
+playwright-report
+coverage
