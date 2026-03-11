@@ -4,7 +4,7 @@ import { useEffect } from "react";
 import { toast } from "sonner";
 import type { Route } from "./+types/index";
 import { requireAdmin } from "~/lib/auth/server";
-import { auth } from "~/lib/auth/server";
+import { listUsers } from "~/services/user.server";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 
@@ -16,35 +16,10 @@ export async function loader({ request }: Route.LoaderArgs) {
   const url = new URL(request.url);
   const searchQuery = url.searchParams.get("search") || "";
   const page = parseInt(url.searchParams.get("page") || "1", 10);
-  const offset = (page - 1) * ITEMS_PER_PAGE;
 
-  const result = await auth.api.listUsers({
-    query: {
-      searchValue: searchQuery || undefined,
-      searchField: "email",
-      searchOperator: "contains",
-      limit: ITEMS_PER_PAGE,
-      offset,
-      sortBy: "createdAt",
-      sortDirection: "desc",
-    },
-    headers: request.headers,
-  });
+  const { users, pagination } = await listUsers(page, searchQuery, request.headers);
 
-  const totalCount = result.total;
-  const totalPages = Math.ceil(totalCount / ITEMS_PER_PAGE);
-
-  return {
-    users: result.users,
-    pagination: {
-      currentPage: page,
-      totalPages,
-      totalCount,
-      hasNextPage: page < totalPages,
-      hasPreviousPage: page > 1,
-    },
-    searchQuery,
-  };
+  return { users, pagination, searchQuery };
 }
 
 export function meta(_args: Route.MetaArgs) {
@@ -145,6 +120,9 @@ export default function Users({ loaderData }: Route.ComponentProps) {
                   Role
                 </th>
                 <th className="px-6 py-3 text-left text-sm font-medium text-foreground">
+                  Status
+                </th>
+                <th className="px-6 py-3 text-left text-sm font-medium text-foreground">
                   Created At
                 </th>
                 <th className="px-6 py-3 text-right text-sm font-medium text-foreground">
@@ -155,7 +133,7 @@ export default function Users({ loaderData }: Route.ComponentProps) {
             <tbody className="divide-y">
               {users.length === 0 ? (
                 <tr>
-                  <td colSpan={5} className="px-6 py-12 text-center text-muted-foreground">
+                  <td colSpan={6} className="px-6 py-12 text-center text-muted-foreground">
                     {searchQuery ? "No users found matching your search" : "No users yet"}
                   </td>
                 </tr>
@@ -181,6 +159,17 @@ export default function Users({ loaderData }: Route.ComponentProps) {
                         }`}
                       >
                         {user.role === "admin" ? "Admin" : "User"}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4">
+                      <span
+                        className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${
+                          user.emailVerified
+                            ? "bg-green-500/10 text-green-700 border border-green-500/20 dark:text-green-400"
+                            : "bg-yellow-500/10 text-yellow-700 border border-yellow-500/20 dark:text-yellow-400"
+                        }`}
+                      >
+                        {user.emailVerified ? "Active" : "Invited"}
                       </span>
                     </td>
                     <td className="px-6 py-4">
