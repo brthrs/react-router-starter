@@ -1,11 +1,22 @@
 import { type LoaderFunctionArgs, redirect, Link } from "react-router";
 import { useNavigate, useSearchParams } from "react-router";
 import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
 import type { Route } from "./+types/login";
 import { auth } from "~/lib/auth/server";
 import { authClient } from "~/lib/auth/client";
 import { Input } from "~/components/ui/input";
 import { Button } from "~/components/ui/button";
+import { Label } from "~/components/ui/label";
+
+const schema = z.object({
+  email: z.string().email("Please enter a valid email address"),
+  password: z.string().min(1, "Password is required"),
+});
+
+type FormValues = z.infer<typeof schema>;
 
 export function meta(_args: Route.MetaArgs) {
   return [{ title: "Sign In" }];
@@ -23,33 +34,34 @@ export async function loader({ request }: LoaderFunctionArgs) {
 export default function Login() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState<string | null>(null);
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [serverError, setServerError] = useState<string | null>(null);
 
   const successMessage =
     searchParams.get("registered") === "true"
       ? "Account created! Please check your email to verify your address."
       : searchParams.get("verified") === "true"
         ? "Email verified! You can now sign in."
-        : null;
+        : searchParams.get("invited") === "true"
+          ? "Account activated! You can now sign in."
+          : null;
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError(null);
-    setIsSubmitting(true);
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = useForm<FormValues>({ resolver: zodResolver(schema) });
 
+  const onSubmit = async (values: FormValues) => {
+    setServerError(null);
     await authClient.signIn.email(
-      { email, password },
+      { email: values.email, password: values.password },
       {
         onSuccess: (ctx) => {
           const role = (ctx.data?.user as { role?: string } | undefined)?.role;
           navigate(role === "admin" ? "/admin" : "/profile");
         },
         onError: (ctx) => {
-          setError(ctx.error.message);
-          setIsSubmitting(false);
+          setServerError(ctx.error.message);
         },
       },
     );
@@ -72,29 +84,27 @@ export default function Login() {
             </div>
           )}
 
-          <form onSubmit={handleSubmit} className="space-y-6">
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
             <div className="space-y-2">
-              <label htmlFor="email" className="text-sm font-medium text-foreground">
-                Email
-              </label>
+              <Label htmlFor="email">Email</Label>
               <Input
                 id="email"
                 type="email"
                 autoComplete="email"
-                required
                 placeholder="you@example.com"
                 className="h-11"
                 disabled={isSubmitting}
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                aria-invalid={errors.email ? true : undefined}
+                {...register("email")}
               />
+              {errors.email && (
+                <p className="text-sm text-destructive">{errors.email.message}</p>
+              )}
             </div>
 
             <div className="space-y-2">
               <div className="flex items-center justify-between">
-                <label htmlFor="password" className="text-sm font-medium text-foreground">
-                  Password
-                </label>
+                <Label htmlFor="password">Password</Label>
                 <Link
                   to="/forgot-password"
                   className="text-sm text-muted-foreground hover:text-foreground"
@@ -106,18 +116,20 @@ export default function Login() {
                 id="password"
                 type="password"
                 autoComplete="current-password"
-                required
                 placeholder="••••••••"
                 className="h-11"
                 disabled={isSubmitting}
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                aria-invalid={errors.password ? true : undefined}
+                {...register("password")}
               />
+              {errors.password && (
+                <p className="text-sm text-destructive">{errors.password.message}</p>
+              )}
             </div>
 
-            {error && (
+            {serverError && (
               <div className="rounded-md bg-destructive/10 border border-destructive/20 px-4 py-3">
-                <p className="text-sm text-destructive">{error}</p>
+                <p className="text-sm text-destructive">{serverError}</p>
               </div>
             )}
 
