@@ -1,4 +1,4 @@
-import { NavLink } from "react-router";
+import { NavLink, Link } from "react-router";
 import { cn } from "~/lib/utils";
 
 interface AdminLayoutProps {
@@ -17,7 +17,7 @@ export function AdminLayout({ children, userEmail }: AdminLayoutProps) {
       <aside className="fixed inset-y-0 left-0 z-50 w-64 flex flex-col bg-sidebar border-r border-sidebar-border">
         <div className="flex h-16 items-center gap-3 px-6 border-b border-sidebar-border">
           <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-sidebar-primary">
-            <TrainIcon className="h-5 w-5 text-sidebar-primary-foreground" />
+            <CodeIcon className="h-5 w-5 text-sidebar-primary-foreground" />
           </div>
           <div className="flex flex-col">
             <span className="text-sm font-semibold text-sidebar-foreground">React Router Starter</span>
@@ -46,18 +46,19 @@ export function AdminLayout({ children, userEmail }: AdminLayoutProps) {
           ))}
         </nav>
 
-        <div className="border-t border-sidebar-border p-4">
-          <div className="flex items-center gap-3">
-            <div className="flex h-9 w-9 items-center justify-center rounded-full bg-sidebar-accent">
+        <div className="border-t border-sidebar-border p-4 space-y-1">
+          <Link
+            to="/profile"
+            className="flex items-center gap-3 rounded-lg px-3 py-2 hover:bg-sidebar-accent/50 transition-colors"
+          >
+            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-sidebar-accent">
               <UserIcon className="h-4 w-4 text-sidebar-foreground" />
             </div>
-            <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium text-sidebar-foreground truncate">
-                {userEmail || "User"}
-              </p>
-            </div>
-          </div>
-          <form action="/logout" method="post" className="mt-3">
+            <p className="text-sm font-medium text-sidebar-foreground truncate">
+              {userEmail || "User"}
+            </p>
+          </Link>
+          <form action="/logout" method="post">
             <button
               type="submit"
               className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm text-sidebar-foreground/70 hover:bg-sidebar-accent/50 hover:text-sidebar-foreground transition-colors"
@@ -108,14 +109,10 @@ function LogOutIcon({ className }: { className?: string }) {
   );
 }
 
-function TrainIcon({ className }: { className?: string }) {
+function CodeIcon({ className }: { className?: string }) {
   return (
     <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-      <path strokeLinecap="round" strokeLinejoin="round" d="M12 3C8 3 5 4 5 6v10c0 1.1.9 2 2 2l-1 2h12l-1-2c1.1 0 2-.9 2-2V6c0-2-3-3-7-3Z" />
-      <path strokeLinecap="round" strokeLinejoin="round" d="M12 3v4M5 10h14" />
-      <circle cx="8.5" cy="14" r="1" fill="currentColor" />
-      <circle cx="15.5" cy="14" r="1" fill="currentColor" />
-      <path strokeLinecap="round" strokeLinejoin="round" d="M2 21h20" />
+      <path strokeLinecap="round" strokeLinejoin="round" d="M17.25 6.75 22.5 12l-5.25 5.25m-10.5 0L1.5 12l5.25-5.25m7.5-3-4.5 16.5" />
     </svg>
   );
 }
