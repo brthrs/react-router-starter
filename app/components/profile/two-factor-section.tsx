@@ -4,23 +4,24 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { QRCodeSVG } from "qrcode.react";
+import i18n from "~/lib/i18n";
 import { authClient } from "~/lib/auth/client";
 import { Input } from "~/components/ui/input";
 import { Button } from "~/components/ui/button";
 import { Label } from "~/components/ui/label";
 
 const enable2faSchema = z.object({
-  password: z.string().min(1, "Password is required"),
+  password: z.string().min(1, i18n.t("validation.passwordRequired")),
 });
 type Enable2faValues = z.infer<typeof enable2faSchema>;
 
 const verify2faSchema = z.object({
-  code: z.string().length(6, "Code must be 6 digits"),
+  code: z.string().length(6, i18n.t("validation.codeMustBe6Digits")),
 });
 type Verify2faValues = z.infer<typeof verify2faSchema>;
 
 const disable2faSchema = z.object({
-  password: z.string().min(1, "Password is required"),
+  password: z.string().min(1, i18n.t("validation.passwordRequired")),
 });
 type Disable2faValues = z.infer<typeof disable2faSchema>;
 
@@ -50,7 +51,7 @@ export function TwoFactorSection({ initialEnabled }: TwoFactorSectionProps) {
     setEnableError(null);
     const { data, error } = await authClient.twoFactor.enable({ password: values.password });
     if (error || !data) {
-      setEnableError(error?.message ?? "Failed to enable 2FA.");
+      setEnableError(error?.message ?? t("errors.failedToEnable2fa"));
       return;
     }
     setEnableState({ step: "qr", totpURI: data.totpURI, backupCodes: data.backupCodes });
@@ -60,7 +61,7 @@ export function TwoFactorSection({ initialEnabled }: TwoFactorSectionProps) {
     setEnableError(null);
     const { error } = await authClient.twoFactor.verifyTotp({ code: values.code });
     if (error) {
-      setEnableError(error.message ?? "Invalid code. Please try again.");
+      setEnableError(error.message ?? t("errors.invalidCodeRetry"));
       return;
     }
     if (enableState.step === "qr") {
@@ -74,7 +75,7 @@ export function TwoFactorSection({ initialEnabled }: TwoFactorSectionProps) {
     setDisableSuccess(false);
     const { error } = await authClient.twoFactor.disable({ password: values.password });
     if (error) {
-      setDisableError(error.message ?? "Failed to disable 2FA.");
+      setDisableError(error.message ?? t("errors.failedToDisable2fa"));
       return;
     }
     setTwoFactorEnabled(false);
@@ -111,7 +112,7 @@ export function TwoFactorSection({ initialEnabled }: TwoFactorSectionProps) {
               id="enable-password"
               type="password"
               autoComplete="current-password"
-              placeholder="••••••••"
+              placeholder={t("common.passwordPlaceholder")}
               className="h-11"
               {...enableForm.register("password")}
               disabled={enableForm.formState.isSubmitting}
@@ -214,7 +215,7 @@ export function TwoFactorSection({ initialEnabled }: TwoFactorSectionProps) {
               id="disable-password"
               type="password"
               autoComplete="current-password"
-              placeholder="••••••••"
+              placeholder={t("common.passwordPlaceholder")}
               className="h-11"
               {...disableForm.register("password")}
               disabled={disableForm.formState.isSubmitting}

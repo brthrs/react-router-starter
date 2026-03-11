@@ -59,7 +59,7 @@ export function AdminLayout({ children, userEmail }: AdminLayoutProps) {
                 <UserIcon className="h-4 w-4 text-sidebar-foreground" />
               </div>
               <p className="text-sm font-medium text-sidebar-foreground truncate">
-                {userEmail || "User"}
+                {userEmail || t("common.user")}
               </p>
             </Link>
             <ThemeToggle />

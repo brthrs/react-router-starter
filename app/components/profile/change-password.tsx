@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+import i18n from "~/lib/i18n";
 import { authClient } from "~/lib/auth/client";
 import { Input } from "~/components/ui/input";
 import { Button } from "~/components/ui/button";
@@ -10,12 +11,12 @@ import { Label } from "~/components/ui/label";
 
 const passwordSchema = z
   .object({
-    currentPassword: z.string().min(1, "Current password is required"),
-    newPassword: z.string().min(8, "Password must be at least 8 characters"),
+    currentPassword: z.string().min(1, i18n.t("validation.currentPasswordRequired")),
+    newPassword: z.string().min(8, i18n.t("validation.passwordMin8")),
     confirmPassword: z.string(),
   })
   .refine((d) => d.newPassword === d.confirmPassword, {
-    message: "Passwords do not match",
+    message: i18n.t("validation.passwordsDoNotMatch"),
     path: ["confirmPassword"],
   });
 
@@ -37,7 +38,7 @@ export function ChangePassword() {
       revokeOtherSessions: false,
     });
     if (err) {
-      setError(err.message ?? "Failed to update password.");
+      setError(err.message ?? t("errors.failedToUpdatePassword"));
     } else {
       setSuccess(true);
       form.reset();
@@ -54,7 +55,7 @@ export function ChangePassword() {
             id="currentPassword"
             type="password"
             autoComplete="current-password"
-            placeholder="••••••••"
+            placeholder={t("common.passwordPlaceholder")}
             className="h-11"
             {...form.register("currentPassword")}
             aria-invalid={form.formState.errors.currentPassword ? true : undefined}
@@ -72,7 +73,7 @@ export function ChangePassword() {
             id="newPassword"
             type="password"
             autoComplete="new-password"
-            placeholder="••••••••"
+            placeholder={t("common.passwordPlaceholder")}
             className="h-11"
             {...form.register("newPassword")}
             aria-invalid={form.formState.errors.newPassword ? true : undefined}
@@ -88,7 +89,7 @@ export function ChangePassword() {
             id="confirmPassword"
             type="password"
             autoComplete="new-password"
-            placeholder="••••••••"
+            placeholder={t("common.passwordPlaceholder")}
             className="h-11"
             {...form.register("confirmPassword")}
             aria-invalid={form.formState.errors.confirmPassword ? true : undefined}

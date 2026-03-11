@@ -5,22 +5,23 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useState } from "react";
 import type { Route } from "./+types/reset-password";
+import i18n from "~/lib/i18n";
 import { authClient } from "~/lib/auth/client";
 import { Input } from "~/components/ui/input";
 import { Button } from "~/components/ui/button";
 import { Label } from "~/components/ui/label";
 
 export function meta(_args: Route.MetaArgs) {
-  return [{ title: "Reset Password" }];
+  return [{ title: i18n.t("auth.resetPassword.title") }];
 }
 
 const schema = z
   .object({
-    password: z.string().min(8, "Password must be at least 8 characters"),
+    password: z.string().min(8, i18n.t("validation.passwordMin8")),
     confirmPassword: z.string(),
   })
   .refine((data) => data.password === data.confirmPassword, {
-    message: "Passwords do not match",
+    message: i18n.t("validation.passwordsDoNotMatch"),
     path: ["confirmPassword"],
   });
 
@@ -46,7 +47,7 @@ export default function ResetPassword() {
       token,
     });
     if (error) {
-      setServerError(error.message ?? "Something went wrong. Please try again.");
+      setServerError(error.message ?? t("errors.somethingWentWrongRetry"));
     } else {
       setDone(true);
     }
@@ -96,7 +97,7 @@ export default function ResetPassword() {
                 id="password"
                 type="password"
                 autoComplete="new-password"
-                placeholder="••••••••"
+                placeholder={t("common.passwordPlaceholder")}
                 className="h-11"
                 disabled={isSubmitting}
                 {...register("password")}
@@ -113,7 +114,7 @@ export default function ResetPassword() {
                 id="confirmPassword"
                 type="password"
                 autoComplete="new-password"
-                placeholder="••••••••"
+                placeholder={t("common.passwordPlaceholder")}
                 className="h-11"
                 disabled={isSubmitting}
                 {...register("confirmPassword")}

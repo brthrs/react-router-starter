@@ -3,6 +3,7 @@ import { ArrowLeft, Loader2 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { z } from "zod";
 import type { Route } from "./+types/new";
+import i18n from "~/lib/i18n";
 import { requireAdmin } from "~/lib/auth/server";
 import { createUser } from "~/services/user.server";
 import { Button } from "~/components/ui/button";
@@ -10,8 +11,8 @@ import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
 
 const schema = z.object({
-  name: z.string().min(1, "Please enter a name"),
-  email: z.string().email("Please enter a valid email address"),
+  name: z.string().min(1, i18n.t("validation.nameRequired")),
+  email: z.string().email(i18n.t("validation.invalidEmail")),
   role: z.string().optional(),
 });
 
@@ -41,7 +42,7 @@ export async function action({ request }: Route.ActionArgs) {
 }
 
 export function meta(_args: Route.MetaArgs) {
-  return [{ title: "Add User - React Router Starter" }];
+  return [{ title: `${i18n.t("admin.newUser.title")} - ${i18n.t("admin.sidebar.appName")}` }];
 }
 
 export default function NewUser() {
@@ -73,7 +74,7 @@ export default function NewUser() {
               id="name"
               name="name"
               type="text"
-              placeholder="John Doe"
+              placeholder={t("common.namePlaceholder")}
               required
               aria-invalid={actionData?.errors?.name ? true : undefined}
             />
@@ -88,7 +89,7 @@ export default function NewUser() {
               id="email"
               name="email"
               type="email"
-              placeholder="user@example.com"
+              placeholder={t("common.emailPlaceholder")}
               required
               aria-invalid={actionData?.errors?.email ? true : undefined}
             />

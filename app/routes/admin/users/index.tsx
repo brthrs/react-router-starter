@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import type { Route } from "./+types/index";
+import i18n from "~/lib/i18n";
 import { requireAdmin } from "~/lib/auth/server";
 import { listUsers } from "~/services/user.server";
 import { Button } from "~/components/ui/button";
@@ -24,7 +25,7 @@ export async function loader({ request }: Route.LoaderArgs) {
 }
 
 export function meta(_args: Route.MetaArgs) {
-  return [{ title: "Users - React Router Starter" }];
+  return [{ title: `${i18n.t("admin.users.title")} - ${i18n.t("admin.sidebar.appName")}` }];
 }
 
 type LoaderData = Awaited<ReturnType<typeof loader>>;
@@ -36,22 +37,22 @@ export default function Users({ loaderData }: Route.ComponentProps) {
 
   useEffect(() => {
     if (searchParams.get("created") === "true") {
-      toast.success("User created successfully");
+      toast.success(t("admin.users.userCreated"));
       const newParams = new URLSearchParams(searchParams);
       newParams.delete("created");
       setSearchParams(newParams, { replace: true });
     } else if (searchParams.get("updated") === "true") {
-      toast.success("User updated successfully");
+      toast.success(t("admin.users.userUpdated"));
       const newParams = new URLSearchParams(searchParams);
       newParams.delete("updated");
       setSearchParams(newParams, { replace: true });
     } else if (searchParams.get("deleted") === "true") {
-      toast.success("User deleted successfully");
+      toast.success(t("admin.users.userDeleted"));
       const newParams = new URLSearchParams(searchParams);
       newParams.delete("deleted");
       setSearchParams(newParams, { replace: true });
     }
-  }, [searchParams, setSearchParams]);
+  }, [searchParams, setSearchParams, t]);
 
   const handleSearch = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();

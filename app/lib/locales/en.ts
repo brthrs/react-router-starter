@@ -38,11 +38,22 @@ export default {
     confirmNewPassword: "Confirm New Password",
     emailPlaceholder: "you@example.com",
     passwordPlaceholder: "••••••••",
+    namePlaceholder: "John Doe",
     backToSignIn: "Back to sign in",
     forgotPassword: "Forgot password?",
     noAccount: "Don't have an account?",
     createOne: "Create one",
     hasAccount: "Already have an account?",
+  },
+
+  validation: {
+    invalidEmail: "Please enter a valid email address",
+    passwordRequired: "Password is required",
+    passwordMin8: "Password must be at least 8 characters",
+    passwordsDoNotMatch: "Passwords do not match",
+    nameRequired: "Please enter a name",
+    currentPasswordRequired: "Current password is required",
+    codeMustBe6Digits: "Code must be 6 digits",
   },
 
   auth: {
@@ -168,6 +179,9 @@ export default {
       noUsersYet: "No users yet",
       showingRange: "Showing {{from}} to {{to}} of {{total}} users",
       pageOf: "Page {{current}} of {{total}}",
+      userCreated: "User created successfully",
+      userUpdated: "User updated successfully",
+      userDeleted: "User deleted successfully",
     },
     newUser: {
       title: "Add User",
@@ -187,6 +201,7 @@ export default {
         "This user has not yet accepted their invite. You can resend the invite link.",
       resendInvite: "Resend Invite",
       resending: "Sending...",
+      inviteResent: "Invite resent successfully",
       dangerZone: "Danger Zone",
       deleteWarning: "Once you delete a user, there is no going back. Please be certain.",
       cannotDeleteSelf:
@@ -204,11 +219,24 @@ export default {
 
   errors: {
     somethingWentWrong: "Something went wrong",
+    somethingWentWrongRetry: "Something went wrong. Please try again.",
     unexpectedError: "An unexpected error occurred. Please try again later.",
     accessDenied: "Access denied",
     accessDeniedDescription: "You don't have permission to view this page.",
     pageNotFound: "Page not found",
     pageNotFoundDescription: "The page you're looking for doesn't exist or has been moved.",
     tryAgain: "Try again",
+    errorStatus: "Error {{status}}",
+    failedToUpdatePassword: "Failed to update password.",
+    failedToEnable2fa: "Failed to enable 2FA.",
+    invalidCodeRetry: "Invalid code. Please try again.",
+    failedToSendCode: "Failed to send code. Please try again.",
+    invalidBackupCode: "Invalid backup code. Please try again.",
+    failedToDisable2fa: "Failed to disable 2FA.",
+    failedToDeleteAccount: "Failed to delete account.",
+    invalidInviteLink: "Invalid invite link",
+    inviteNoLongerValid: "This invite is no longer valid",
+    cannotDeleteOwnAccount: "You cannot delete your own account",
+    userNotFound: "User not found",
   },
 } as const;
