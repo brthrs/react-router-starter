@@ -108,12 +108,25 @@ export default {
       backupDescription: "Enter one of your backup codes. Each code can only be used once.",
       resend: "Resend",
     },
+    setup2fa: {
+      title: "Set up two-factor authentication",
+      subtitle: "Your organization requires 2FA. Set it up to continue.",
+      required: "Required",
+      activated: "Two-factor authentication is now active. Redirecting...",
+    },
     acceptInvite: {
       title: "Set up your account",
       subtitle: "Welcome, {{name}}. Choose a password to activate your account.",
       activateAccount: "Activate account",
       activating: "Activating account...",
       passwordHint: "Must be at least 8 characters long",
+      invalidLink: "This invite link is invalid or has expired",
+      invalidLinkDescription:
+        "The invite link you followed is no longer valid. Please ask an administrator to send you a new one.",
+      alreadyAccepted: "Invite already used",
+      alreadyAcceptedDescription:
+        "This invite has already been used to set up an account. You can sign in directly.",
+      signInToAccount: "Sign in to your account",
     },
   },
 
