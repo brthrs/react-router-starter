@@ -1,26 +1,28 @@
 import { isRouteErrorResponse, Link, useRouteError } from "react-router";
+import { useTranslation } from "react-i18next";
 import { Button } from "~/components/ui/button";
 
 export function RouteErrorBoundary() {
+  const { t } = useTranslation();
   const error = useRouteError();
 
   let status = 500;
-  let title = "Something went wrong";
-  let description = "An unexpected error occurred. Please try again later.";
+  let title = t("errors.somethingWentWrong");
+  let description = t("errors.unexpectedError");
 
   if (isRouteErrorResponse(error)) {
     status = error.status;
     switch (error.status) {
       case 403:
-        title = "Access denied";
-        description = "You don't have permission to view this page.";
+        title = t("errors.accessDenied");
+        description = t("errors.accessDeniedDescription");
         break;
       case 404:
-        title = "Page not found";
-        description = "The page you're looking for doesn't exist or has been moved.";
+        title = t("errors.pageNotFound");
+        description = t("errors.pageNotFoundDescription");
         break;
       default:
-        title = `Error ${error.status}`;
+        title = t("errors.errorStatus", { status: error.status });
         description = error.statusText || description;
     }
   }
@@ -33,10 +35,10 @@ export function RouteErrorBoundary() {
         <p className="text-muted-foreground">{description}</p>
         <div className="flex items-center justify-center gap-3 pt-2">
           <Button variant="outline" onClick={() => window.history.back()}>
-            Go back
+            {t("common.back")}
           </Button>
           <Button asChild>
-            <Link to="/">Home</Link>
+            <Link to="/">{t("common.home")}</Link>
           </Button>
         </div>
       </div>

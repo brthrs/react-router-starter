@@ -5,6 +5,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useState } from "react";
 import type { Route } from "./+types/forgot-password";
+import i18n from "~/lib/i18n";
 import { auth } from "~/lib/auth/server";
 import { authClient } from "~/lib/auth/client";
 import { Input } from "~/components/ui/input";
@@ -12,7 +13,7 @@ import { Button } from "~/components/ui/button";
 import { Label } from "~/components/ui/label";
 
 export function meta(_args: Route.MetaArgs) {
-  return [{ title: "Forgot Password" }];
+  return [{ title: i18n.t("auth.forgotPassword.title") }];
 }
 
 export async function loader({ request }: LoaderFunctionArgs) {
@@ -22,7 +23,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
 }
 
 const schema = z.object({
-  email: z.string().email("Please enter a valid email address"),
+  email: z.string().email(i18n.t("validation.invalidEmail")),
 });
 
 type FormValues = z.infer<typeof schema>;
@@ -45,7 +46,7 @@ export default function ForgotPassword() {
       redirectTo: "/reset-password",
     });
     if (error) {
-      setServerError(error.message ?? "Something went wrong. Please try again.");
+      setServerError(error.message ?? t("errors.somethingWentWrongRetry"));
     } else {
       setSent(true);
     }
@@ -88,7 +89,7 @@ export default function ForgotPassword() {
                 id="email"
                 type="email"
                 autoComplete="email"
-                placeholder="you@example.com"
+                placeholder={t("common.emailPlaceholder")}
                 className="h-11"
                 disabled={isSubmitting}
                 {...register("email")}

@@ -38,11 +38,22 @@ export default {
     confirmNewPassword: "Nieuw wachtwoord bevestigen",
     emailPlaceholder: "jij@voorbeeld.nl",
     passwordPlaceholder: "••••••••",
+    namePlaceholder: "Jan Jansen",
     backToSignIn: "Terug naar inloggen",
     forgotPassword: "Wachtwoord vergeten?",
     noAccount: "Nog geen account?",
     createOne: "Maak er een aan",
     hasAccount: "Heb je al een account?",
+  },
+
+  validation: {
+    invalidEmail: "Voer een geldig e-mailadres in",
+    passwordRequired: "Wachtwoord is verplicht",
+    passwordMin8: "Wachtwoord moet minimaal 8 tekens bevatten",
+    passwordsDoNotMatch: "Wachtwoorden komen niet overeen",
+    nameRequired: "Voer een naam in",
+    currentPasswordRequired: "Huidig wachtwoord is verplicht",
+    codeMustBe6Digits: "Code moet 6 cijfers bevatten",
   },
 
   auth: {
@@ -172,6 +183,9 @@ export default {
       noUsersYet: "Nog geen gebruikers",
       showingRange: "{{from}} t/m {{to}} van {{total}} gebruikers",
       pageOf: "Pagina {{current}} van {{total}}",
+      userCreated: "Gebruiker succesvol aangemaakt",
+      userUpdated: "Gebruiker succesvol bijgewerkt",
+      userDeleted: "Gebruiker succesvol verwijderd",
     },
     newUser: {
       title: "Gebruiker toevoegen",
@@ -192,6 +206,7 @@ export default {
         "Deze gebruiker heeft de uitnodiging nog niet geaccepteerd. Je kunt de uitnodigingslink opnieuw versturen.",
       resendInvite: "Uitnodiging opnieuw versturen",
       resending: "Versturen...",
+      inviteResent: "Uitnodiging opnieuw verstuurd",
       dangerZone: "Gevarenzone",
       deleteWarning:
         "Zodra je een gebruiker verwijdert, is er geen weg meer terug. Weet het zeker.",
@@ -211,6 +226,7 @@ export default {
 
   errors: {
     somethingWentWrong: "Er is iets misgegaan",
+    somethingWentWrongRetry: "Er is iets misgegaan. Probeer het opnieuw.",
     unexpectedError: "Er is een onverwachte fout opgetreden. Probeer het later opnieuw.",
     accessDenied: "Toegang geweigerd",
     accessDeniedDescription: "Je hebt geen toestemming om deze pagina te bekijken.",
@@ -218,5 +234,17 @@ export default {
     pageNotFoundDescription:
       "De pagina die je zoekt bestaat niet of is verplaatst.",
     tryAgain: "Opnieuw proberen",
+    errorStatus: "Fout {{status}}",
+    failedToUpdatePassword: "Wachtwoord bijwerken mislukt.",
+    failedToEnable2fa: "2FA inschakelen mislukt.",
+    invalidCodeRetry: "Ongeldige code. Probeer het opnieuw.",
+    failedToSendCode: "Code versturen mislukt. Probeer het opnieuw.",
+    invalidBackupCode: "Ongeldige herstelcode. Probeer het opnieuw.",
+    failedToDisable2fa: "2FA uitschakelen mislukt.",
+    failedToDeleteAccount: "Account verwijderen mislukt.",
+    invalidInviteLink: "Ongeldige uitnodigingslink",
+    inviteNoLongerValid: "Deze uitnodiging is niet meer geldig",
+    cannotDeleteOwnAccount: "Je kunt je eigen account niet verwijderen",
+    userNotFound: "Gebruiker niet gevonden",
   },
 } as const;

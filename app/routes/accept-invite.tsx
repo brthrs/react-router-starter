@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import { Loader2 } from "lucide-react";
 import { z } from "zod";
 import type { Route } from "./+types/accept-invite";
+import i18n from "~/lib/i18n";
 import { validateInviteToken, acceptInvite } from "~/services/invite.server";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
@@ -10,11 +11,11 @@ import { Input } from "~/components/ui/input";
 const schema = z
   .object({
     token: z.string().min(1),
-    password: z.string().min(8, "Password must be at least 8 characters"),
+    password: z.string().min(8, i18n.t("validation.passwordMin8")),
     confirmPassword: z.string(),
   })
   .refine((data) => data.password === data.confirmPassword, {
-    message: "Passwords do not match",
+    message: i18n.t("validation.passwordsDoNotMatch"),
     path: ["confirmPassword"],
   });
 
@@ -26,7 +27,7 @@ interface ActionErrors {
 }
 
 export function meta(_args: Route.MetaArgs) {
-  return [{ title: "Accept Invite - React Router Starter" }];
+  return [{ title: `${i18n.t("auth.acceptInvite.title")} - ${i18n.t("admin.sidebar.appName")}` }];
 }
 
 export async function loader({ request }: Route.LoaderArgs) {
@@ -34,7 +35,7 @@ export async function loader({ request }: Route.LoaderArgs) {
   const token = url.searchParams.get("token");
 
   if (!token) {
-    throw new Response("Invalid invite link", { status: 400 });
+    throw new Response(i18n.t("errors.invalidInviteLink"), { status: 400 });
   }
 
   const invite = await validateInviteToken(token);
@@ -58,7 +59,7 @@ export async function action({ request }: Route.ActionArgs) {
   try {
     await acceptInvite(token, password);
   } catch {
-    return { errors: { form: ["This invite is no longer valid"] } as ActionErrors };
+    return { errors: { form: [i18n.t("errors.inviteNoLongerValid")] } as ActionErrors };
   }
 
   return redirect("/login?invited=true");
@@ -109,7 +110,7 @@ export default function AcceptInvite() {
                 id="password"
                 name="password"
                 type="password"
-                placeholder="••••••••"
+                placeholder={t("common.passwordPlaceholder")}
                 required
                 minLength={8}
                 className="h-11"
@@ -130,7 +131,7 @@ export default function AcceptInvite() {
                 id="confirmPassword"
                 name="confirmPassword"
                 type="password"
-                placeholder="••••••••"
+                placeholder={t("common.passwordPlaceholder")}
                 required
                 minLength={8}
                 className="h-11"

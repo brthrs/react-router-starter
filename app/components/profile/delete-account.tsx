@@ -30,13 +30,13 @@ export function DeleteAccount({ userEmail }: DeleteAccountProps) {
     try {
       const { error: err } = await authClient.deleteUser();
       if (err) {
-        setError(err.message ?? "Failed to delete account.");
+        setError(err.message ?? t("errors.failedToDeleteAccount"));
         setIsDeleting(false);
         return;
       }
       window.location.href = "/login?deleted=true";
     } catch {
-      setError("Failed to delete account.");
+      setError(t("errors.failedToDeleteAccount"));
       setIsDeleting(false);
     }
   };

@@ -6,6 +6,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useState } from "react";
 import type { Route } from "./+types/register";
+import i18n from "~/lib/i18n";
 import { auth } from "~/lib/auth/server";
 import { authClient } from "~/lib/auth/client";
 import { Input } from "~/components/ui/input";
@@ -13,7 +14,7 @@ import { Button } from "~/components/ui/button";
 import { Label } from "~/components/ui/label";
 
 export function meta(_args: Route.MetaArgs) {
-  return [{ title: "Register" }];
+  return [{ title: i18n.t("auth.register.title") }];
 }
 
 export async function loader({ request }: LoaderFunctionArgs) {
@@ -24,13 +25,13 @@ export async function loader({ request }: LoaderFunctionArgs) {
 
 const schema = z
   .object({
-    name: z.string().min(1, "Name is required"),
-    email: z.string().email("Please enter a valid email address"),
-    password: z.string().min(8, "Password must be at least 8 characters"),
+    name: z.string().min(1, i18n.t("validation.nameRequired")),
+    email: z.string().email(i18n.t("validation.invalidEmail")),
+    password: z.string().min(8, i18n.t("validation.passwordMin8")),
     confirmPassword: z.string(),
   })
   .refine((data) => data.password === data.confirmPassword, {
-    message: "Passwords do not match",
+    message: i18n.t("validation.passwordsDoNotMatch"),
     path: ["confirmPassword"],
   });
 
@@ -74,7 +75,7 @@ export default function Register() {
                 id="name"
                 type="text"
                 autoComplete="name"
-                placeholder="John Doe"
+                placeholder={t("common.namePlaceholder")}
                 className="h-11"
                 disabled={isSubmitting}
                 {...register("name")}
@@ -91,7 +92,7 @@ export default function Register() {
                 id="email"
                 type="email"
                 autoComplete="email"
-                placeholder="you@example.com"
+                placeholder={t("common.emailPlaceholder")}
                 className="h-11"
                 disabled={isSubmitting}
                 {...register("email")}
@@ -108,7 +109,7 @@ export default function Register() {
                 id="password"
                 type="password"
                 autoComplete="new-password"
-                placeholder="••••••••"
+                placeholder={t("common.passwordPlaceholder")}
                 className="h-11"
                 disabled={isSubmitting}
                 {...register("password")}
@@ -125,7 +126,7 @@ export default function Register() {
                 id="confirmPassword"
                 type="password"
                 autoComplete="new-password"
-                placeholder="••••••••"
+                placeholder={t("common.passwordPlaceholder")}
                 className="h-11"
                 disabled={isSubmitting}
                 {...register("confirmPassword")}

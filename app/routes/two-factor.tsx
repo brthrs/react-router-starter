@@ -3,6 +3,7 @@ import { useNavigate } from "react-router";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import type { Route } from "./+types/two-factor";
+import i18n from "~/lib/i18n";
 import { auth } from "~/lib/auth/server";
 import { authClient } from "~/lib/auth/client";
 import { Input } from "~/components/ui/input";
@@ -10,7 +11,7 @@ import { Button } from "~/components/ui/button";
 import { Label } from "~/components/ui/label";
 
 export function meta(_args: Route.MetaArgs) {
-  return [{ title: "Two-Factor Authentication" }];
+  return [{ title: i18n.t("auth.twoFactor.title") }];
 }
 
 export async function loader({ request }: LoaderFunctionArgs) {
@@ -41,7 +42,7 @@ export default function TwoFactor() {
     setIsSubmitting(true);
     const { error: err } = await authClient.twoFactor.verifyTotp({ code });
     if (err) {
-      setError(err.message ?? "Invalid code. Please try again.");
+      setError(err.message ?? t("errors.invalidCodeRetry"));
       setIsSubmitting(false);
     } else {
       handleRedirect();
@@ -53,7 +54,7 @@ export default function TwoFactor() {
     setError(null);
     const { error: err } = await authClient.twoFactor.sendOtp();
     if (err) {
-      setError(err.message ?? "Failed to send code. Please try again.");
+      setError(err.message ?? t("errors.failedToSendCode"));
     } else {
       setOtpSent(true);
     }
@@ -66,7 +67,7 @@ export default function TwoFactor() {
     setIsSubmitting(true);
     const { error: err } = await authClient.twoFactor.verifyOtp({ code });
     if (err) {
-      setError(err.message ?? "Invalid code. Please try again.");
+      setError(err.message ?? t("errors.invalidCodeRetry"));
       setIsSubmitting(false);
     } else {
       handleRedirect();
@@ -79,7 +80,7 @@ export default function TwoFactor() {
     setIsSubmitting(true);
     const { error: err } = await authClient.twoFactor.verifyBackupCode({ code });
     if (err) {
-      setError(err.message ?? "Invalid backup code. Please try again.");
+      setError(err.message ?? t("errors.invalidBackupCode"));
       setIsSubmitting(false);
     } else {
       handleRedirect();
@@ -104,18 +105,18 @@ export default function TwoFactor() {
 
         <div className="bg-card rounded-lg shadow-sm border">
           <div className="flex border-b">
-            {tabs.map((t) => (
+            {tabs.map((tabItem) => (
               <button
-                key={t.id}
+                key={tabItem.id}
                 type="button"
-                onClick={() => { setTab(t.id); setCode(""); setError(null); setOtpSent(false); }}
+                onClick={() => { setTab(tabItem.id); setCode(""); setError(null); setOtpSent(false); }}
                 className={`flex-1 px-4 py-3 text-sm font-medium transition-colors ${
-                  tab === t.id
+                  tab === tabItem.id
                     ? "border-b-2 border-primary text-foreground"
                     : "text-muted-foreground hover:text-foreground"
                 }`}
               >
-                {t.label}
+                {tabItem.label}
               </button>
             ))}
           </div>

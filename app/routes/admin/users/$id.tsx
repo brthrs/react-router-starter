@@ -3,6 +3,7 @@ import { ArrowLeft, Loader2, Mail, Trash2 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { z } from "zod";
 import type { Route } from "./+types/$id";
+import i18n from "~/lib/i18n";
 import { requireAdmin } from "~/lib/auth/server";
 import { getUserById, updateUser, deleteUser } from "~/services/user.server";
 import { resendInvite } from "~/services/invite.server";
@@ -11,8 +12,8 @@ import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
 
 const schema = z.object({
-  name: z.string().min(1, "Please enter a name"),
-  email: z.string().email("Please enter a valid email address"),
+  name: z.string().min(1, i18n.t("validation.nameRequired")),
+  email: z.string().email(i18n.t("validation.invalidEmail")),
   role: z.string().optional(),
 });
 
@@ -41,7 +42,7 @@ export async function action({ request, params }: Route.ActionArgs) {
 
   if (intent === "delete") {
     if (currentUserId === userId) {
-      return { errors: { delete: ["You cannot delete your own account"] } as ActionErrors };
+      return { errors: { delete: [i18n.t("errors.cannotDeleteOwnAccount")] } as ActionErrors };
     }
 
     await deleteUser(userId, request.headers);
@@ -53,10 +54,10 @@ export async function action({ request, params }: Route.ActionArgs) {
     try {
       await resendInvite(userId);
     } catch {
-      return { errors: { invite: ["User not found"] } as ActionErrors };
+      return { errors: { invite: [i18n.t("errors.userNotFound")] } as ActionErrors };
     }
 
-    return { success: { invite: "Invite resent successfully" } };
+    return { success: { invite: i18n.t("admin.editUser.inviteResent") } };
   }
 
   const result = schema.safeParse({
@@ -76,7 +77,7 @@ export async function action({ request, params }: Route.ActionArgs) {
 }
 
 export function meta({ data }: Route.MetaArgs) {
-  return [{ title: `Edit User - ${data?.user.email || "User"} - React Router Starter` }];
+  return [{ title: `${i18n.t("admin.editUser.title")} - ${data?.user.email || i18n.t("common.user")} - ${i18n.t("admin.sidebar.appName")}` }];
 }
 
 export default function EditUser({ loaderData }: Route.ComponentProps) {
@@ -170,7 +171,7 @@ export default function EditUser({ loaderData }: Route.ComponentProps) {
               name="name"
               type="text"
               defaultValue={user.name}
-              placeholder="John Doe"
+              placeholder={t("common.namePlaceholder")}
               required
               aria-invalid={actionData?.errors?.name ? true : undefined}
             />
@@ -186,7 +187,7 @@ export default function EditUser({ loaderData }: Route.ComponentProps) {
               name="email"
               type="email"
               defaultValue={user.email}
-              placeholder="user@example.com"
+              placeholder={t("common.emailPlaceholder")}
               required
               aria-invalid={actionData?.errors?.email ? true : undefined}
             />

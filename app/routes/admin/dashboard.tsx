@@ -1,9 +1,10 @@
 import { useTranslation } from "react-i18next";
 import type { Route } from "./+types/dashboard";
+import i18n from "~/lib/i18n";
 import { requireAuth } from "~/lib/auth/server";
 
 export function meta(_args: Route.MetaArgs) {
-  return [{ title: "Dashboard - Admin" }];
+  return [{ title: `${i18n.t("admin.dashboard.title")} - ${i18n.t("admin.title")}` }];
 }
 
 export async function loader({ request }: Route.LoaderArgs) {
