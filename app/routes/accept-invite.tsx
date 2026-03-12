@@ -39,8 +39,9 @@ export async function loader({ request }: Route.LoaderArgs) {
     return { status: "not_found" as const };
   }
 
+  const signedOut = url.searchParams.get("_so") === "1";
   const session = await auth.api.getSession({ headers: request.headers });
-  if (session) {
+  if (session && !signedOut) {
     const signOutResponse = await auth.api.signOut({
       headers: request.headers,
       asResponse: true,
@@ -48,7 +49,7 @@ export async function loader({ request }: Route.LoaderArgs) {
     const setCookie = signOutResponse.headers.get("Set-Cookie");
     const headers = new Headers();
     if (setCookie) headers.set("Set-Cookie", setCookie);
-    throw redirect(request.url, { headers });
+    throw redirect(`/accept-invite?token=${token}&_so=1`, { headers });
   }
 
   const result = await getInviteStatus(token);
