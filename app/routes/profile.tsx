@@ -2,7 +2,7 @@ import { type LoaderFunctionArgs, Link, Form } from "react-router";
 import { useTranslation } from "react-i18next";
 import type { Route } from "./+types/profile";
 import i18n from "~/lib/i18n";
-import { requireAuth } from "~/lib/auth/server";
+import { require2FASetup } from "~/lib/auth/server";
 import { getFileUrl } from "~/lib/storage.server";
 import { Button } from "~/components/ui/button";
 import { ThemeToggle } from "~/components/theme-toggle";
@@ -17,7 +17,7 @@ export function meta(_args: Route.MetaArgs) {
 }
 
 export async function loader({ request }: LoaderFunctionArgs) {
-  const session = await requireAuth(request);
+  const session = await require2FASetup(request);
   const imageKey = session.user.image as string | null;
   const imageUrl = imageKey ? await getFileUrl(imageKey) : null;
   return {

@@ -34,22 +34,20 @@ export async function createInvite(
   }
 }
 
-export async function validateInviteToken(token: string) {
+export type InviteStatus =
+  | { status: "valid"; name: string; email: string }
+  | { status: "already_accepted" }
+  | { status: "expired" }
+  | { status: "not_found" };
+
+export async function getInviteStatus(token: string): Promise<InviteStatus> {
   const invite = await prisma.invite.findUnique({ where: { token } });
 
-  if (!invite) {
-    throw new Response("Invite not found", { status: 404 });
-  }
+  if (!invite) return { status: "not_found" };
+  if (invite.acceptedAt) return { status: "already_accepted" };
+  if (invite.expiresAt < new Date()) return { status: "expired" };
 
-  if (invite.acceptedAt) {
-    throw new Response("This invite has already been used", { status: 410 });
-  }
-
-  if (invite.expiresAt < new Date()) {
-    throw new Response("This invite has expired", { status: 410 });
-  }
-
-  return invite;
+  return { status: "valid", name: invite.name, email: invite.email };
 }
 
 export async function resendInvite(userId: string) {

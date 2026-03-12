@@ -25,15 +25,21 @@ export function meta(_args: Route.MetaArgs) {
 }
 
 export async function loader({ request }: LoaderFunctionArgs) {
+  const forceTwoFactor = process.env.FORCE_2FA === "true";
   const session = await auth.api.getSession({ headers: request.headers });
   if (session) {
+    const twoFactorEnabled =
+      (session.user as { twoFactorEnabled?: boolean }).twoFactorEnabled ?? false;
+    if (forceTwoFactor && !twoFactorEnabled) {
+      throw redirect("/setup-2fa");
+    }
     const role = (session.user as { role?: string }).role;
     throw redirect(role === "admin" ? "/admin" : "/profile");
   }
-  return {};
+  return { forceTwoFactor };
 }
 
-export default function Login() {
+export default function Login({ loaderData }: Route.ComponentProps) {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
@@ -62,8 +68,14 @@ export default function Login() {
       { email: values.email, password: values.password },
       {
         onSuccess: (ctx) => {
-          const role = (ctx.data?.user as { role?: string } | undefined)?.role;
-          navigate(role === "admin" ? "/admin" : "/profile");
+          const user = ctx.data?.user as
+            | { role?: string; twoFactorEnabled?: boolean }
+            | undefined;
+          if (loaderData.forceTwoFactor && !user?.twoFactorEnabled) {
+            navigate("/setup-2fa");
+            return;
+          }
+          navigate(user?.role === "admin" ? "/admin" : "/profile");
         },
         onError: (ctx) => {
           setServerError(ctx.error.message);

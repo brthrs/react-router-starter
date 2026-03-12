@@ -2,7 +2,7 @@ import { type LoaderFunctionArgs, Link, Form } from "react-router";
 import { useTranslation } from "react-i18next";
 import type { Route } from "./+types/index";
 import i18n from "~/lib/i18n";
-import { requireAuth } from "~/lib/auth/server";
+import { require2FASetup } from "~/lib/auth/server";
 import { Button } from "~/components/ui/button";
 import { ThemeToggle } from "~/components/theme-toggle";
 import { RouteErrorBoundary } from "~/components/route-error-boundary";
@@ -12,7 +12,7 @@ export function meta(_args: Route.MetaArgs) {
 }
 
 export async function loader({ request }: LoaderFunctionArgs) {
-  const session = await requireAuth(request);
+  const session = await require2FASetup(request);
   return {
     user: {
       name: session.user.name,

@@ -110,12 +110,25 @@ export default {
         "Voer een van je herstelcodes in. Elke code kan slechts één keer worden gebruikt.",
       resend: "Opnieuw versturen",
     },
+    setup2fa: {
+      title: "Tweefactorauthenticatie instellen",
+      subtitle: "Je organisatie vereist 2FA. Stel het in om door te gaan.",
+      required: "Verplicht",
+      activated: "Tweefactorauthenticatie is nu actief. Doorsturen...",
+    },
     acceptInvite: {
       title: "Account instellen",
       subtitle: "Welkom, {{name}}. Kies een wachtwoord om je account te activeren.",
       activateAccount: "Account activeren",
       activating: "Account activeren...",
       passwordHint: "Moet minimaal 8 tekens lang zijn",
+      invalidLink: "Deze uitnodigingslink is ongeldig of verlopen",
+      invalidLinkDescription:
+        "De uitnodigingslink die je hebt gevolgd is niet meer geldig. Vraag een beheerder om je een nieuwe te sturen.",
+      alreadyAccepted: "Uitnodiging al gebruikt",
+      alreadyAcceptedDescription:
+        "Deze uitnodiging is al gebruikt om een account in te stellen. Je kunt direct inloggen.",
+      signInToAccount: "Inloggen op je account",
     },
   },
 
@@ -132,9 +145,14 @@ export default {
       setupPrompt: "Voer je wachtwoord in om 2FA in te stellen.",
       setUp: "2FA instellen",
       scanQr: "Stap 1 — Scan deze QR-code met je authenticator-app",
+      cantScan: "Kun je niet scannen? Voer deze sleutel handmatig in je app in:",
       saveBackupCodes: "Stap 2 — Bewaar deze herstelcodes",
       backupCodesNote:
         "Bewaar deze op een veilige plek. Elke code kan slechts één keer worden gebruikt.",
+      copyCodes: "Alle codes kopiëren",
+      copiedCodes: "Gekopieerd!",
+      downloadCodes: "Codes downloaden",
+      savedCodesConfirm: "Ik heb mijn herstelcodes opgeslagen op een veilige plek",
       verifyStep: "Stap 3 — Verifieer met een code uit je app",
       verifyAndActivate: "Verifiëren & activeren",
       activated: "Tweefactorauthenticatie is nu actief op je account.",

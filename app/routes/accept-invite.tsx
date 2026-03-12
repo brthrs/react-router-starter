@@ -1,10 +1,11 @@
 import { Form, Link, redirect, useActionData, useLoaderData, useNavigation } from "react-router";
 import { useTranslation } from "react-i18next";
-import { Loader2 } from "lucide-react";
+import { Loader2, LinkIcon, ClockIcon, CheckCircleIcon } from "lucide-react";
 import { z } from "zod";
 import type { Route } from "./+types/accept-invite";
 import i18n from "~/lib/i18n";
-import { validateInviteToken, acceptInvite } from "~/services/invite.server";
+import { auth } from "~/lib/auth/server";
+import { getInviteStatus, acceptInvite } from "~/services/invite.server";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 
@@ -35,12 +36,29 @@ export async function loader({ request }: Route.LoaderArgs) {
   const token = url.searchParams.get("token");
 
   if (!token) {
-    throw new Response(i18n.t("errors.invalidInviteLink"), { status: 400 });
+    return { status: "not_found" as const };
   }
 
-  const invite = await validateInviteToken(token);
+  const signedOut = url.searchParams.get("_so") === "1";
+  const session = await auth.api.getSession({ headers: request.headers });
+  if (session && !signedOut) {
+    const signOutResponse = await auth.api.signOut({
+      headers: request.headers,
+      asResponse: true,
+    });
+    const setCookie = signOutResponse.headers.get("Set-Cookie");
+    const headers = new Headers();
+    if (setCookie) headers.set("Set-Cookie", setCookie);
+    throw redirect(`/accept-invite?token=${token}&_so=1`, { headers });
+  }
 
-  return { name: invite.name, email: invite.email, token };
+  const result = await getInviteStatus(token);
+
+  if (result.status !== "valid") {
+    return { status: result.status };
+  }
+
+  return { status: "valid" as const, name: result.name, email: result.email, token };
 }
 
 export async function action({ request }: Route.ActionArgs) {
@@ -56,21 +74,85 @@ export async function action({ request }: Route.ActionArgs) {
   }
 
   const { token, password } = result.data;
+
+  const inviteStatus = await getInviteStatus(token);
+  if (inviteStatus.status !== "valid") {
+    return { errors: { form: [i18n.t("errors.inviteNoLongerValid")] } as ActionErrors };
+  }
+
   try {
     await acceptInvite(token, password);
   } catch {
-    return { errors: { form: [i18n.t("errors.inviteNoLongerValid")] } as ActionErrors };
+    return { errors: { form: [i18n.t("errors.somethingWentWrongRetry")] } as ActionErrors };
   }
 
   return redirect("/login?invited=true");
 }
 
+function InvalidInvitePage({
+  icon: Icon,
+  title,
+  description,
+}: {
+  icon: React.ComponentType<{ className?: string }>;
+  title: string;
+  description: string;
+}) {
+  const { t } = useTranslation();
+
+  return (
+    <div className="flex min-h-screen items-center justify-center bg-background px-4">
+      <div className="w-full max-w-md space-y-8 text-center">
+        <div className="flex justify-center">
+          <div className="flex h-16 w-16 items-center justify-center rounded-full bg-muted">
+            <Icon className="h-8 w-8 text-muted-foreground" />
+          </div>
+        </div>
+
+        <div className="space-y-2">
+          <h1 className="text-2xl font-bold tracking-tight">{title}</h1>
+          <p className="text-muted-foreground">{description}</p>
+        </div>
+
+        <Link
+          to="/login"
+          className="inline-flex h-11 w-full items-center justify-center rounded-md bg-primary px-8 text-sm font-medium text-primary-foreground shadow transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+        >
+          {t("auth.acceptInvite.signInToAccount")}
+        </Link>
+      </div>
+    </div>
+  );
+}
+
 export default function AcceptInvite() {
   const { t } = useTranslation();
-  const { name, email, token } = useLoaderData<typeof loader>();
+  const loaderData = useLoaderData<typeof loader>();
   const actionData = useActionData<typeof action>();
   const navigation = useNavigation();
   const isSubmitting = navigation.state === "submitting";
+
+  if (loaderData.status === "already_accepted") {
+    return (
+      <InvalidInvitePage
+        icon={CheckCircleIcon}
+        title={t("auth.acceptInvite.alreadyAccepted")}
+        description={t("auth.acceptInvite.alreadyAcceptedDescription")}
+      />
+    );
+  }
+
+  if (loaderData.status === "expired" || loaderData.status === "not_found") {
+    return (
+      <InvalidInvitePage
+        icon={loaderData.status === "expired" ? ClockIcon : LinkIcon}
+        title={t("auth.acceptInvite.invalidLink")}
+        description={t("auth.acceptInvite.invalidLinkDescription")}
+      />
+    );
+  }
+
+  const { name, email, token } = loaderData;
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-background px-4">

@@ -9,6 +9,7 @@ export default [
   route("/reset-password", "routes/reset-password.tsx"),
   route("/verify-email", "routes/verify-email.tsx"),
   route("/two-factor", "routes/two-factor.tsx"),
+  route("/setup-2fa", "routes/setup-2fa.tsx"),
   route("/profile", "routes/profile.tsx"),
   route("/accept-invite", "routes/accept-invite.tsx"),
   route("/api/hello", "routes/api/hello.ts"),

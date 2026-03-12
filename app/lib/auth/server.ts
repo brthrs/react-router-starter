@@ -51,6 +51,7 @@ export const auth = betterAuth({
   plugins: [
     admin(),
     twoFactor({
+      issuer: process.env.APP_NAME ?? "My App",
       otpOptions: {
         sendOTP: async ({ user, otp }) => {
           sendEmail({
@@ -77,8 +78,18 @@ export async function requireAuth(request: Request) {
   return session;
 }
 
-export async function requireAdmin(request: Request) {
+export async function require2FASetup(request: Request) {
   const session = await requireAuth(request);
+
+  if (process.env.FORCE_2FA === "true" && !session.user.twoFactorEnabled) {
+    throw redirect("/setup-2fa");
+  }
+
+  return session;
+}
+
+export async function requireAdmin(request: Request) {
+  const session = await require2FASetup(request);
 
   if (session.user.role !== "admin") {
     throw new Response("Forbidden", { status: 403 });
