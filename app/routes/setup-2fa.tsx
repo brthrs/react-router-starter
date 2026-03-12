@@ -6,6 +6,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { QRCodeSVG } from "qrcode.react";
 import { useNavigate } from "react-router";
+import { Check, Clipboard, Download } from "lucide-react";
 import type { Route } from "./+types/setup-2fa";
 import i18n from "~/lib/i18n";
 import { requireAuth } from "~/lib/auth/server";
@@ -13,6 +14,7 @@ import { authClient } from "~/lib/auth/client";
 import { Input } from "~/components/ui/input";
 import { Button } from "~/components/ui/button";
 import { Label } from "~/components/ui/label";
+import { Checkbox } from "~/components/ui/checkbox";
 import { RouteErrorBoundary } from "~/components/route-error-boundary";
 
 const passwordSchema = z.object({
@@ -50,6 +52,8 @@ export default function SetupTwoFactor({ loaderData }: Route.ComponentProps) {
   const navigate = useNavigate();
   const [state, setState] = useState<SetupState>({ step: "password" });
   const [error, setError] = useState<string | null>(null);
+
+  const [codesConfirmed, setCodesConfirmed] = useState(false);
 
   const passwordForm = useForm<PasswordValues>({
     resolver: zodResolver(passwordSchema),
@@ -174,6 +178,21 @@ export default function SetupTwoFactor({ loaderData }: Route.ComponentProps) {
                 <p className="text-xs text-muted-foreground">
                   {t("profile.twoFactor.backupCodesNote")}
                 </p>
+                <div className="flex items-center gap-2 pt-1">
+                  <Checkbox
+                    id="codes-confirmed"
+                    checked={codesConfirmed}
+                    onCheckedChange={(checked) =>
+                      setCodesConfirmed(checked === true)
+                    }
+                  />
+                  <Label
+                    htmlFor="codes-confirmed"
+                    className="text-sm font-normal cursor-pointer"
+                  >
+                    {t("profile.twoFactor.savedCodesConfirm")}
+                  </Label>
+                </div>
               </div>
 
               <div className="space-y-2">
@@ -189,14 +208,14 @@ export default function SetupTwoFactor({ loaderData }: Route.ComponentProps) {
                     placeholder="000000"
                     maxLength={6}
                     className="h-11 w-40 text-center tracking-widest text-lg"
-                    disabled={codeForm.formState.isSubmitting}
+                    disabled={codeForm.formState.isSubmitting || !codesConfirmed}
                     autoFocus
                     {...codeForm.register("code")}
                   />
                   <Button
                     type="submit"
                     className="h-11"
-                    disabled={codeForm.formState.isSubmitting}
+                    disabled={codeForm.formState.isSubmitting || !codesConfirmed}
                   >
                     {codeForm.formState.isSubmitting
                       ? t("common.verifying")
@@ -231,13 +250,62 @@ function formatTotpSecret(uri: string): string {
 }
 
 function BackupCodeGrid({ codes }: { codes: string[] }) {
+  const { t } = useTranslation();
+  const [copied, setCopied] = useState(false);
+
+  const handleCopy = async () => {
+    await navigator.clipboard.writeText(codes.join("\n"));
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  const handleDownload = () => {
+    const blob = new Blob([codes.join("\n")], { type: "text/plain" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "backup-codes.txt";
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
   return (
-    <div className="rounded-lg border bg-muted/50 p-4 grid grid-cols-2 gap-2">
-      {codes.map((c) => (
-        <code key={c} className="text-xs font-mono text-foreground">
-          {c}
-        </code>
-      ))}
+    <div className="space-y-2">
+      <div className="rounded-lg border bg-muted/50 p-4 grid grid-cols-2 gap-2">
+        {codes.map((c) => (
+          <code key={c} className="text-xs font-mono text-foreground">
+            {c}
+          </code>
+        ))}
+      </div>
+      <div className="flex gap-2">
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          className="gap-1.5"
+          onClick={handleCopy}
+        >
+          {copied ? (
+            <Check className="h-3.5 w-3.5 text-green-600" />
+          ) : (
+            <Clipboard className="h-3.5 w-3.5" />
+          )}
+          {copied
+            ? t("profile.twoFactor.copiedCodes")
+            : t("profile.twoFactor.copyCodes")}
+        </Button>
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          className="gap-1.5"
+          onClick={handleDownload}
+        >
+          <Download className="h-3.5 w-3.5" />
+          {t("profile.twoFactor.downloadCodes")}
+        </Button>
+      </div>
     </div>
   );
 }

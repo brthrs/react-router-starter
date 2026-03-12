@@ -149,6 +149,10 @@ export default {
       saveBackupCodes: "Stap 2 — Bewaar deze herstelcodes",
       backupCodesNote:
         "Bewaar deze op een veilige plek. Elke code kan slechts één keer worden gebruikt.",
+      copyCodes: "Alle codes kopiëren",
+      copiedCodes: "Gekopieerd!",
+      downloadCodes: "Codes downloaden",
+      savedCodesConfirm: "Ik heb mijn herstelcodes opgeslagen op een veilige plek",
       verifyStep: "Stap 3 — Verifieer met een code uit je app",
       verifyAndActivate: "Verifiëren & activeren",
       activated: "Tweefactorauthenticatie is nu actief op je account.",
