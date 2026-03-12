@@ -34,6 +34,22 @@ export async function createInvite(
   }
 }
 
+export type InviteStatus =
+  | { status: "valid"; name: string; email: string }
+  | { status: "already_accepted" }
+  | { status: "expired" }
+  | { status: "not_found" };
+
+export async function getInviteStatus(token: string): Promise<InviteStatus> {
+  const invite = await prisma.invite.findUnique({ where: { token } });
+
+  if (!invite) return { status: "not_found" };
+  if (invite.acceptedAt) return { status: "already_accepted" };
+  if (invite.expiresAt < new Date()) return { status: "expired" };
+
+  return { status: "valid", name: invite.name, email: invite.email };
+}
+
 export async function validateInviteToken(token: string) {
   const invite = await prisma.invite.findUnique({ where: { token } });
 
