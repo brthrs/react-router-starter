@@ -50,24 +50,6 @@ export async function getInviteStatus(token: string): Promise<InviteStatus> {
   return { status: "valid", name: invite.name, email: invite.email };
 }
 
-export async function validateInviteToken(token: string) {
-  const invite = await prisma.invite.findUnique({ where: { token } });
-
-  if (!invite) {
-    throw new Response("Invite not found", { status: 404 });
-  }
-
-  if (invite.acceptedAt) {
-    throw new Response("This invite has already been used", { status: 410 });
-  }
-
-  if (invite.expiresAt < new Date()) {
-    throw new Response("This invite has expired", { status: 410 });
-  }
-
-  return invite;
-}
-
 export async function resendInvite(userId: string) {
   const user = await prisma.user.findUnique({ where: { id: userId } });
 

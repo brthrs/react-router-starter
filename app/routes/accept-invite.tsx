@@ -74,10 +74,16 @@ export async function action({ request }: Route.ActionArgs) {
   }
 
   const { token, password } = result.data;
+
+  const inviteStatus = await getInviteStatus(token);
+  if (inviteStatus.status !== "valid") {
+    return { errors: { form: [i18n.t("errors.inviteNoLongerValid")] } as ActionErrors };
+  }
+
   try {
     await acceptInvite(token, password);
   } catch {
-    return { errors: { form: [i18n.t("errors.inviteNoLongerValid")] } as ActionErrors };
+    return { errors: { form: [i18n.t("errors.somethingWentWrongRetry")] } as ActionErrors };
   }
 
   return redirect("/login?invited=true");
