@@ -156,9 +156,14 @@ export default function SetupTwoFactor({ loaderData }: Route.ComponentProps) {
                 <div className="flex justify-center p-4 bg-white rounded-lg w-fit mx-auto">
                   <QRCodeSVG value={state.totpURI} size={180} />
                 </div>
-                <p className="text-xs text-muted-foreground break-all font-mono">
-                  {state.totpURI}
-                </p>
+                <details className="text-xs text-muted-foreground">
+                  <summary className="cursor-pointer select-none">
+                    {t("profile.twoFactor.cantScan")}
+                  </summary>
+                  <p className="mt-2 font-mono tracking-widest break-all">
+                    {formatTotpSecret(state.totpURI)}
+                  </p>
+                </details>
               </div>
 
               <div className="space-y-3">
@@ -218,6 +223,11 @@ export default function SetupTwoFactor({ loaderData }: Route.ComponentProps) {
       </div>
     </div>
   );
+}
+
+function formatTotpSecret(uri: string): string {
+  const secret = new URL(uri).searchParams.get("secret") ?? "";
+  return secret.match(/.{1,4}/g)?.join(" ") ?? secret;
 }
 
 function BackupCodeGrid({ codes }: { codes: string[] }) {

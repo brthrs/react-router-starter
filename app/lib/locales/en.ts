@@ -143,6 +143,7 @@ export default {
       setupPrompt: "Enter your password to begin setting up 2FA.",
       setUp: "Set up 2FA",
       scanQr: "Step 1 — Scan this QR code with your authenticator app",
+      cantScan: "Can't scan? Enter this key manually in your app:",
       saveBackupCodes: "Step 2 — Save these backup codes",
       backupCodesNote: "Store these somewhere safe. Each code can only be used once.",
       verifyStep: "Step 3 — Verify with a code from your app",

@@ -145,6 +145,7 @@ export default {
       setupPrompt: "Voer je wachtwoord in om 2FA in te stellen.",
       setUp: "2FA instellen",
       scanQr: "Stap 1 — Scan deze QR-code met je authenticator-app",
+      cantScan: "Kun je niet scannen? Voer deze sleutel handmatig in je app in:",
       saveBackupCodes: "Stap 2 — Bewaar deze herstelcodes",
       backupCodesNote:
         "Bewaar deze op een veilige plek. Elke code kan slechts één keer worden gebruikt.",
