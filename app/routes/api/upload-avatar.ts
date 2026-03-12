@@ -1,5 +1,5 @@
 import type { ActionFunctionArgs } from "react-router";
-import { requireAuth } from "~/lib/auth/server";
+import { require2FASetup } from "~/lib/auth/server";
 import { uploadFile, deleteFile } from "~/lib/storage.server";
 import { prisma } from "~/lib/db.server";
 
@@ -7,7 +7,7 @@ const MAX_SIZE = 5 * 1024 * 1024; // 5 MB
 const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp", "image/gif"];
 
 export async function action({ request }: ActionFunctionArgs) {
-  const session = await requireAuth(request);
+  const session = await require2FASetup(request);
 
   const formData = await request.formData();
   const file = formData.get("avatar");
