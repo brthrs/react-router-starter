@@ -51,6 +51,7 @@ export const auth = betterAuth({
   plugins: [
     admin(),
     twoFactor({
+      issuer: process.env.APP_NAME ?? "My App",
       otpOptions: {
         sendOTP: async ({ user, otp }) => {
           sendEmail({
