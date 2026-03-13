@@ -25,8 +25,8 @@ export const auth = betterAuth({
       sendEmail({
         to: user.email,
         subject: "Reset your password",
-        text: `Click the link to reset your password: ${url}`,
-        html: `<p>Click the link to reset your password:</p><p><a href="${url}">${url}</a></p>`,
+        template: "password-reset",
+        variables: { url },
       });
     },
   },
@@ -35,8 +35,8 @@ export const auth = betterAuth({
       sendEmail({
         to: user.email,
         subject: "Verify your email address",
-        text: `Click the link to verify your email: ${url}`,
-        html: `<p>Click the link to verify your email address:</p><p><a href="${url}">${url}</a></p>`,
+        template: "email-verification",
+        variables: { url },
       });
     },
     sendOnSignUp: true,
@@ -57,8 +57,8 @@ export const auth = betterAuth({
           sendEmail({
             to: user.email,
             subject: "Your two-factor authentication code",
-            text: `Your 2FA code is: ${otp}. It expires in 10 minutes.`,
-            html: `<p>Your 2FA code is: <strong>${otp}</strong></p><p>It expires in 10 minutes.</p>`,
+            template: "two-factor-otp",
+            variables: { otp },
           });
         },
       },
