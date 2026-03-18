@@ -18,7 +18,7 @@ import { Checkbox } from "~/components/ui/checkbox";
 import { RouteErrorBoundary } from "~/components/route-error-boundary";
 
 const passwordSchema = z.object({
-  password: z.string().min(8, i18n.t("validation.passwordMin8")).max(128),
+  password: z.string().min(1, i18n.t("validation.passwordRequired")).max(128),
 });
 type PasswordValues = z.infer<typeof passwordSchema>;
 
