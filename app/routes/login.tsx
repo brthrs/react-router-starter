@@ -14,7 +14,7 @@ import { Button } from "~/components/ui/button";
 import { Label } from "~/components/ui/label";
 
 const schema = z.object({
-  email: z.string().email(i18n.t("validation.invalidEmail")),
+  email: z.email(i18n.t("validation.invalidEmail")),
   password: z.string().min(1, i18n.t("validation.passwordRequired")),
 });
 
