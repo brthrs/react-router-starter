@@ -12,7 +12,7 @@ import { Input } from "~/components/ui/input";
 const schema = z
   .object({
     token: z.string().min(1),
-    password: z.string().min(8, i18n.t("validation.passwordMin8")),
+    password: z.string().min(8, i18n.t("validation.passwordMin8")).max(128),
     confirmPassword: z.string(),
   })
   .refine((data) => data.password === data.confirmPassword, {

@@ -12,7 +12,7 @@ import { Label } from "~/components/ui/label";
 
 const schema = z.object({
   name: z.string().min(1, i18n.t("validation.nameRequired")),
-  email: z.string().email(i18n.t("validation.invalidEmail")),
+  email: z.email(i18n.t("validation.invalidEmail")),
   role: z.string().optional(),
 });
 

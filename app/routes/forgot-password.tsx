@@ -23,7 +23,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
 }
 
 const schema = z.object({
-  email: z.string().email(i18n.t("validation.invalidEmail")),
+  email: z.email(i18n.t("validation.invalidEmail")),
 });
 
 type FormValues = z.infer<typeof schema>;
@@ -56,10 +56,10 @@ export default function ForgotPassword() {
     return (
       <div className="flex min-h-screen items-center justify-center bg-background px-4">
         <div className="w-full max-w-md space-y-8 text-center">
-          <h1 className="text-4xl font-bold tracking-tight">{t("auth.forgotPassword.checkEmail")}</h1>
-          <p className="text-muted-foreground">
-            {t("auth.forgotPassword.checkEmailDescription")}
-          </p>
+          <h1 className="text-4xl font-bold tracking-tight">
+            {t("auth.forgotPassword.checkEmail")}
+          </h1>
+          <p className="text-muted-foreground">{t("auth.forgotPassword.checkEmailDescription")}</p>
           <Link
             to="/login"
             className="inline-block text-sm font-medium text-foreground underline underline-offset-4"
@@ -76,9 +76,7 @@ export default function ForgotPassword() {
       <div className="w-full max-w-md space-y-8">
         <div className="text-center">
           <h1 className="text-4xl font-bold tracking-tight">{t("auth.forgotPassword.title")}</h1>
-          <p className="mt-2 text-muted-foreground">
-            {t("auth.forgotPassword.subtitle")}
-          </p>
+          <p className="mt-2 text-muted-foreground">{t("auth.forgotPassword.subtitle")}</p>
         </div>
 
         <div className="bg-card rounded-lg shadow-sm border p-8">
@@ -95,9 +93,7 @@ export default function ForgotPassword() {
                 {...register("email")}
                 aria-invalid={errors.email ? true : undefined}
               />
-              {errors.email && (
-                <p className="text-sm text-destructive">{errors.email.message}</p>
-              )}
+              {errors.email && <p className="text-sm text-destructive">{errors.email.message}</p>}
             </div>
 
             {serverError && (

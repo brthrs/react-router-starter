@@ -26,8 +26,8 @@ export async function loader({ request }: LoaderFunctionArgs) {
 const schema = z
   .object({
     name: z.string().min(1, i18n.t("validation.nameRequired")),
-    email: z.string().email(i18n.t("validation.invalidEmail")),
-    password: z.string().min(8, i18n.t("validation.passwordMin8")),
+    email: z.email(i18n.t("validation.invalidEmail")),
+    password: z.string().min(8, i18n.t("validation.passwordMin8")).max(128),
     confirmPassword: z.string(),
   })
   .refine((data) => data.password === data.confirmPassword, {

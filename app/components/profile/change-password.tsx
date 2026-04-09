@@ -11,8 +11,8 @@ import { Label } from "~/components/ui/label";
 
 const passwordSchema = z
   .object({
-    currentPassword: z.string().min(1, i18n.t("validation.currentPasswordRequired")),
-    newPassword: z.string().min(8, i18n.t("validation.passwordMin8")),
+    currentPassword: z.string().min(1, i18n.t("validation.passwordRequired")).max(128),
+    newPassword: z.string().min(8, i18n.t("validation.passwordMin8")).max(128),
     confirmPassword: z.string(),
   })
   .refine((d) => d.newPassword === d.confirmPassword, {
