@@ -2,3 +2,7 @@ build
 node_modules
 .react-router
 prisma/migrations
+
+# Handlebars email templates — Prettier's glimmer parser mangles full HTML
+# documents (strips <!DOCTYPE>) and reflows plain-text bodies.
+emails
