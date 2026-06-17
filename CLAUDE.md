@@ -6,25 +6,25 @@ This file is the authoritative ruleset for working in this repository. Follow ev
 
 These are the approved libraries. Do NOT replace any of them with an alternative unless given an extremely compelling justification **and** explicit developer approval.
 
-| Concern | Library | Forbidden alternatives |
-|---|---|---|
-| Framework / Routing | React Router v7 | Next.js, Remix (standalone), TanStack Router |
-| UI Components | Shadcn/ui + Radix UI | Material UI, Ant Design, Chakra UI |
-| Styling | Tailwind CSS v4 | CSS modules, styled-components, Emotion |
-| Forms | React Hook Form + `@hookform/resolvers` | Formik, manual `useState` per field |
-| Validation | Zod | Yup, Joi, manual `if` checks |
-| Auth | Better Auth | NextAuth, Lucia, Clerk, Auth0 |
-| ORM | Prisma with `@prisma/adapter-pg` | Drizzle, TypeORM, Knex, raw SQL |
-| State management | Zustand | Redux, Jotai, Valtio, MobX |
-| Async data fetching | TanStack Query | SWR, raw `fetch` + `useEffect` |
-| i18n | react-i18next | next-intl, FormatJS |
-| Queue / Background jobs | BullMQ + Redis | Agenda, node-cron, `setTimeout`/`setInterval` |
-| Logging | Pino | Winston, Bunyan, `console.log` |
-| Error tracking | Sentry | Bugsnag, Datadog RUM |
-| Toasts | Sonner | react-hot-toast, react-toastify |
-| Email | Nodemailer | SendGrid SDK, Resend SDK |
-| Object storage | AWS S3 SDK (or local filesystem fallback) | — |
-| Testing | Vitest (unit), Playwright (e2e) | Jest, Cypress |
+| Concern                 | Library                                   | Forbidden alternatives                        |
+| ----------------------- | ----------------------------------------- | --------------------------------------------- |
+| Framework / Routing     | React Router v7                           | Next.js, Remix (standalone), TanStack Router  |
+| UI Components           | Shadcn/ui + Radix UI                      | Material UI, Ant Design, Chakra UI            |
+| Styling                 | Tailwind CSS v4                           | CSS modules, styled-components, Emotion       |
+| Forms                   | React Hook Form + `@hookform/resolvers`   | Formik, manual `useState` per field           |
+| Validation              | Zod                                       | Yup, Joi, manual `if` checks                  |
+| Auth                    | Better Auth                               | NextAuth, Lucia, Clerk, Auth0                 |
+| ORM                     | Prisma with `@prisma/adapter-pg`          | Drizzle, TypeORM, Knex, raw SQL               |
+| State management        | Zustand                                   | Redux, Jotai, Valtio, MobX                    |
+| Async data fetching     | TanStack Query                            | SWR, raw `fetch` + `useEffect`                |
+| i18n                    | react-i18next                             | next-intl, FormatJS                           |
+| Queue / Background jobs | BullMQ + Redis                            | Agenda, node-cron, `setTimeout`/`setInterval` |
+| Logging                 | Pino                                      | Winston, Bunyan, `console.log`                |
+| Error tracking          | Sentry                                    | Bugsnag, Datadog RUM                          |
+| Toasts                  | Sonner                                    | react-hot-toast, react-toastify               |
+| Email                   | Nodemailer                                | SendGrid SDK, Resend SDK                      |
+| Object storage          | AWS S3 SDK (or local filesystem fallback) | —                                             |
+| Testing                 | Vitest (unit), Playwright (e2e)           | Jest, Cypress                                 |
 
 ### Anti-pattern enforcement
 
@@ -108,7 +108,9 @@ export function meta(_args: Route.MetaArgs) {
 
 export async function loader({ request }: Route.LoaderArgs) {
   // ...
-  return { /* data */ };
+  return {
+    /* data */
+  };
 }
 
 export async function action({ request }: Route.ActionArgs) {

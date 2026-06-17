@@ -51,12 +51,7 @@ export async function listUsers(page: number, search: string, headers: Headers) 
   };
 }
 
-export async function createUser(
-  name: string,
-  email: string,
-  role: string,
-  headers: Headers
-) {
+export async function createUser(name: string, email: string, role: string, headers: Headers) {
   const validRole = role === "admin" || role === "user" ? role : "user";
 
   await auth.api.createUser({
@@ -72,7 +67,7 @@ export async function createUser(
 export async function updateUser(
   userId: string,
   data: { name: string; email: string; role: string },
-  headers: Headers
+  headers: Headers,
 ) {
   const validRole = data.role === "admin" || data.role === "user" ? data.role : "user";
 

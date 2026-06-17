@@ -10,7 +10,7 @@ export async function createInvite(
   userId: string | null,
   email: string,
   name: string,
-  role: string
+  role: string,
 ) {
   const token = randomBytes(32).toString("hex");
   const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);

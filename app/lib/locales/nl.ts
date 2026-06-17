@@ -60,8 +60,7 @@ export default {
     login: {
       title: "Inloggen",
       subtitle: "Voer je gegevens in om toegang te krijgen tot je account",
-      registered:
-        "Account aangemaakt! Controleer je e-mail om je adres te verifiëren.",
+      registered: "Account aangemaakt! Controleer je e-mail om je adres te verifiëren.",
       verified: "E-mail geverifieerd! Je kunt nu inloggen.",
       inviteAccepted: "Account geactiveerd! Je kunt nu inloggen.",
       accountDeleted: "Je account is verwijderd.",
@@ -157,8 +156,7 @@ export default {
       verifyAndActivate: "Verifiëren & activeren",
       activated: "Tweefactorauthenticatie is nu actief op je account.",
       yourBackupCodes: "Je herstelcodes",
-      backupCodesWarning:
-        "Bewaar deze op een veilige plek. Je kunt ze niet opnieuw bekijken.",
+      backupCodesWarning: "Bewaar deze op een veilige plek. Je kunt ze niet opnieuw bekijken.",
       disablePrompt: "Voer je wachtwoord in om tweefactorauthenticatie uit te schakelen.",
       disable: "2FA uitschakelen",
       disabling: "Uitschakelen...",
@@ -249,8 +247,7 @@ export default {
     accessDenied: "Toegang geweigerd",
     accessDeniedDescription: "Je hebt geen toestemming om deze pagina te bekijken.",
     pageNotFound: "Pagina niet gevonden",
-    pageNotFoundDescription:
-      "De pagina die je zoekt bestaat niet of is verplaatst.",
+    pageNotFoundDescription: "De pagina die je zoekt bestaat niet of is verplaatst.",
     tryAgain: "Opnieuw proberen",
     errorStatus: "Fout {{status}}",
     failedToUpdatePassword: "Wachtwoord bijwerken mislukt.",

@@ -10,14 +10,15 @@ interface ThemeState {
 function applyTheme(theme: Theme) {
   const root = document.documentElement;
   const isDark =
-    theme === "dark" || (theme === "system" && window.matchMedia("(prefers-color-scheme: dark)").matches);
+    theme === "dark" ||
+    (theme === "system" && window.matchMedia("(prefers-color-scheme: dark)").matches);
 
   root.classList.toggle("dark", isDark);
 }
 
 export const useThemeStore = create<ThemeState>((set) => ({
   theme: (typeof window !== "undefined"
-    ? (localStorage.getItem("theme") as Theme) ?? "system"
+    ? ((localStorage.getItem("theme") as Theme) ?? "system")
     : "system") as Theme,
   setTheme: (theme: Theme) => {
     localStorage.setItem("theme", theme);

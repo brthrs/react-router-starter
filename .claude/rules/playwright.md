@@ -38,7 +38,7 @@ raw CSS selector.
 Assert what the user experiences, not the implementation: computed CSS over
 class names, `toBeHidden()` over `toHaveCount(0)` (reserve the latter for when
 DOM absence is itself the requirement). Anchor every negative assertion to a
-positive one that resolves *first*: assert the expected state is present, then
+positive one that resolves _first_: assert the expected state is present, then
 assert the unwanted thing is absent — otherwise the negative passes vacuously
 against a page that simply hasn't rendered yet. Assert related facts on one
 scoped locator (the time inside the meeting card, the card inside its room
@@ -55,7 +55,7 @@ before writing locators against library markup; don't trust docs or memory.
   and friends). Do not use `locator.isVisible()` or other boolean probes as
   waits — they answer immediately.
 - To wait for a network call, set up `page.waitForResponse` with a URL+method
-  matcher *before* triggering the action.
+  matcher _before_ triggering the action.
 - Use `expect.poll()` for eventually consistent values (e.g. localStorage written
   by an effect). Use `toPass()` only to retry a whole assertion block, with an
   explicit timeout.
@@ -64,7 +64,7 @@ before writing locators against library markup; don't trust docs or memory.
   use the real action with `trial: true`.
 - For clock-driven UI (toasts, timers, "X minutes ago"), install `page.clock` at
   the top of the test and advance it explicitly.
-- To prove something does *not* happen, don't wait-and-check: arrange for the
+- To prove something does _not_ happen, don't wait-and-check: arrange for the
   forbidden event to leave evidence in a value you already assert exactly, after
   a barrier event that must happen.
 - If you are tempted to add a wait to "fix flakiness," stop. Flakiness means an

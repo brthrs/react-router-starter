@@ -5,7 +5,7 @@
 - **TypeScript** — strict mode enabled
 - **asdf** — runtime version manager
 - **ESLint** — linting
-- **Git** — version control *(provider tbd)*
+- **Git** — version control _(provider tbd)_
 
 ## Backend & Frontend
 
@@ -21,8 +21,8 @@
 
 ## API
 
-- **tRPC or RESTful** — API layer *(decision pending)*
-- **API documentation** — *(provider tbd)*
+- **tRPC or RESTful** — API layer _(decision pending)_
+- **API documentation** — _(provider tbd)_
 
 ## Data & Storage
 
@@ -33,20 +33,20 @@
 ## AI & LLM
 
 - **GreenPT / EURouter** — AI model provider routing
-- **LangGraph** — complex orchestration *(under consideration)*
-- **Evals** — *(framework tbd)*
+- **LangGraph** — complex orchestration _(under consideration)_
+- **Evals** — _(framework tbd)_
 
 ## Auth & Security
 
 - **Better Auth + 2FA** — authentication
-- **Audit logging** — *(provider tbd)*
+- **Audit logging** — _(provider tbd)_
 
 ## Infrastructure & DevOps
 
 - **Scaleway Managed Kubernetes** — hosting
 - **Devtron** — Kubernetes management & DevOps
 - **Vite** — build tooling
-- **CI/CD pipeline** — *(tbd)*
+- **CI/CD pipeline** — _(tbd)_
 
 ## Observability
 
@@ -62,5 +62,5 @@
 ## Developer Experience
 
 - **Cursor / Claude Code** — AI-assisted coding
-- **Opinionated starter project** — enforced architecture *(coming soon)*
+- **Opinionated starter project** — enforced architecture _(coming soon)_
 - **Scaleway TEM** — transactional email

@@ -98,9 +98,7 @@ export default function TwoFactor() {
       <div className="w-full max-w-md space-y-8">
         <div className="text-center">
           <h1 className="text-4xl font-bold tracking-tight">{t("auth.twoFactor.title")}</h1>
-          <p className="mt-2 text-muted-foreground">
-            {t("auth.twoFactor.subtitle")}
-          </p>
+          <p className="mt-2 text-muted-foreground">{t("auth.twoFactor.subtitle")}</p>
         </div>
 
         <div className="bg-card rounded-lg shadow-sm border">
@@ -109,7 +107,12 @@ export default function TwoFactor() {
               <button
                 key={tabItem.id}
                 type="button"
-                onClick={() => { setTab(tabItem.id); setCode(""); setError(null); setOtpSent(false); }}
+                onClick={() => {
+                  setTab(tabItem.id);
+                  setCode("");
+                  setError(null);
+                  setOtpSent(false);
+                }}
                 className={`flex-1 px-4 py-3 text-sm font-medium transition-colors ${
                   tab === tabItem.id
                     ? "border-b-2 border-primary text-foreground"
@@ -148,7 +151,11 @@ export default function TwoFactor() {
                     <p className="text-sm text-destructive">{error}</p>
                   </div>
                 )}
-                <Button type="submit" className="w-full h-11" disabled={isSubmitting || code.length !== 6}>
+                <Button
+                  type="submit"
+                  className="w-full h-11"
+                  disabled={isSubmitting || code.length !== 6}
+                >
                   {isSubmitting ? t("common.verifying") : t("common.verify")}
                 </Button>
               </form>
@@ -199,14 +206,22 @@ export default function TwoFactor() {
                       </div>
                     )}
                     <div className="flex gap-2">
-                      <Button type="submit" className="flex-1 h-11" disabled={isSubmitting || code.length !== 6}>
+                      <Button
+                        type="submit"
+                        className="flex-1 h-11"
+                        disabled={isSubmitting || code.length !== 6}
+                      >
                         {isSubmitting ? t("common.verifying") : t("common.verify")}
                       </Button>
                       <Button
                         type="button"
                         variant="outline"
                         className="h-11"
-                        onClick={() => { setOtpSent(false); setCode(""); setError(null); }}
+                        onClick={() => {
+                          setOtpSent(false);
+                          setCode("");
+                          setError(null);
+                        }}
                         disabled={isSubmitting}
                       >
                         {t("auth.twoFactor.resend")}
@@ -240,7 +255,11 @@ export default function TwoFactor() {
                     <p className="text-sm text-destructive">{error}</p>
                   </div>
                 )}
-                <Button type="submit" className="w-full h-11" disabled={isSubmitting || !code.trim()}>
+                <Button
+                  type="submit"
+                  className="w-full h-11"
+                  disabled={isSubmitting || !code.trim()}
+                >
                   {isSubmitting ? t("common.verifying") : t("common.verify")}
                 </Button>
               </form>

@@ -27,8 +27,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
       email: session.user.email,
       role: session.user.role as string,
       imageUrl,
-      twoFactorEnabled:
-        (session.user as { twoFactorEnabled?: boolean }).twoFactorEnabled ?? false,
+      twoFactorEnabled: (session.user as { twoFactorEnabled?: boolean }).twoFactorEnabled ?? false,
     },
   };
 }

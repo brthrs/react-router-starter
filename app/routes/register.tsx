@@ -81,9 +81,7 @@ export default function Register() {
                 {...register("name")}
                 aria-invalid={errors.name ? true : undefined}
               />
-              {errors.name && (
-                <p className="text-sm text-destructive">{errors.name.message}</p>
-              )}
+              {errors.name && <p className="text-sm text-destructive">{errors.name.message}</p>}
             </div>
 
             <div className="space-y-2">
@@ -98,9 +96,7 @@ export default function Register() {
                 {...register("email")}
                 aria-invalid={errors.email ? true : undefined}
               />
-              {errors.email && (
-                <p className="text-sm text-destructive">{errors.email.message}</p>
-              )}
+              {errors.email && <p className="text-sm text-destructive">{errors.email.message}</p>}
             </div>
 
             <div className="space-y-2">

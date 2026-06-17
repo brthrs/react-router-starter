@@ -88,9 +88,7 @@ export function TwoFactorSection({ initialEnabled }: TwoFactorSectionProps) {
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-lg font-semibold">{t("profile.twoFactor.title")}</h2>
-          <p className="text-sm text-muted-foreground mt-1">
-            {t("profile.twoFactor.description")}
-          </p>
+          <p className="text-sm text-muted-foreground mt-1">{t("profile.twoFactor.description")}</p>
         </div>
         <span
           className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${
@@ -129,9 +127,7 @@ export function TwoFactorSection({ initialEnabled }: TwoFactorSectionProps) {
             </div>
           )}
           <Button type="submit" disabled={enableForm.formState.isSubmitting}>
-            {enableForm.formState.isSubmitting
-              ? t("common.loading")
-              : t("profile.twoFactor.setUp")}
+            {enableForm.formState.isSubmitting ? t("common.loading") : t("profile.twoFactor.setUp")}
           </Button>
         </form>
       )}
@@ -170,11 +166,7 @@ export function TwoFactorSection({ initialEnabled }: TwoFactorSectionProps) {
                 disabled={verifyForm.formState.isSubmitting}
                 autoFocus
               />
-              <Button
-                type="submit"
-                className="h-11"
-                disabled={verifyForm.formState.isSubmitting}
-              >
+              <Button type="submit" className="h-11" disabled={verifyForm.formState.isSubmitting}>
                 {verifyForm.formState.isSubmitting
                   ? t("common.verifying")
                   : t("profile.twoFactor.verifyAndActivate")}
@@ -238,11 +230,7 @@ export function TwoFactorSection({ initialEnabled }: TwoFactorSectionProps) {
               </p>
             </div>
           )}
-          <Button
-            type="submit"
-            variant="destructive"
-            disabled={disableForm.formState.isSubmitting}
-          >
+          <Button type="submit" variant="destructive" disabled={disableForm.formState.isSubmitting}>
             {disableForm.formState.isSubmitting
               ? t("profile.twoFactor.disabling")
               : t("profile.twoFactor.disable")}

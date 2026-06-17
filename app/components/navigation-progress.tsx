@@ -39,7 +39,11 @@ export function NavigationProgress() {
   }, [isNavigating, cleanup]);
 
   return (
-    <div ref={containerRef} className="fixed top-0 left-0 right-0 z-[9999] h-0.5" style={{ display: "none" }}>
+    <div
+      ref={containerRef}
+      className="fixed top-0 left-0 right-0 z-[9999] h-0.5"
+      style={{ display: "none" }}
+    >
       <div
         ref={barRef}
         className="h-full bg-primary transition-all duration-150 ease-out"

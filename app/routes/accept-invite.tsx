@@ -159,9 +159,7 @@ export default function AcceptInvite() {
       <div className="w-full max-w-md space-y-8">
         <div className="text-center">
           <h1 className="text-4xl font-bold tracking-tight">{t("auth.acceptInvite.title")}</h1>
-          <p className="mt-2 text-muted-foreground">
-            {t("auth.acceptInvite.subtitle", { name })}
-          </p>
+          <p className="mt-2 text-muted-foreground">{t("auth.acceptInvite.subtitle", { name })}</p>
         </div>
 
         <div className="bg-card rounded-lg shadow-sm border p-8">
@@ -227,7 +225,9 @@ export default function AcceptInvite() {
 
             <Button type="submit" className="w-full h-11" disabled={isSubmitting}>
               {isSubmitting && <Loader2 className="animate-spin" />}
-              {isSubmitting ? t("auth.acceptInvite.activating") : t("auth.acceptInvite.activateAccount")}
+              {isSubmitting
+                ? t("auth.acceptInvite.activating")
+                : t("auth.acceptInvite.activateAccount")}
             </Button>
           </Form>
         </div>
