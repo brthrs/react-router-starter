@@ -1,3 +1,6 @@
+// nodemailer is v9 but @types/nodemailer is still v8 (DefinitelyTyped has no v9
+// yet, and v9 ships no bundled types). The API we use is unchanged across v8→v9.
+// Bump @types/nodemailer to ^9 once it's published.
 import nodemailer from "nodemailer";
 import { logger } from "./logger.server";
 import { renderEmail } from "./email-templates.server";
