@@ -14,7 +14,7 @@ import { Button } from "~/components/ui/button";
 import { Label } from "~/components/ui/label";
 
 const schema = z.object({
-  email: z.string().email(i18n.t("validation.invalidEmail")),
+  email: z.email(i18n.t("validation.invalidEmail")),
   password: z.string().min(1, i18n.t("validation.passwordRequired")),
 });
 
@@ -68,9 +68,7 @@ export default function Login({ loaderData }: Route.ComponentProps) {
       { email: values.email, password: values.password },
       {
         onSuccess: (ctx) => {
-          const user = ctx.data?.user as
-            | { role?: string; twoFactorEnabled?: boolean }
-            | undefined;
+          const user = ctx.data?.user as { role?: string; twoFactorEnabled?: boolean } | undefined;
           if (loaderData.forceTwoFactor && !user?.twoFactorEnabled) {
             navigate("/setup-2fa");
             return;
@@ -89,9 +87,7 @@ export default function Login({ loaderData }: Route.ComponentProps) {
       <div className="w-full max-w-md space-y-8">
         <div className="text-center">
           <h1 className="text-4xl font-bold tracking-tight">{t("auth.login.title")}</h1>
-          <p className="mt-2 text-muted-foreground">
-            {t("auth.login.subtitle")}
-          </p>
+          <p className="mt-2 text-muted-foreground">{t("auth.login.subtitle")}</p>
         </div>
 
         <div className="bg-card rounded-lg shadow-sm border p-8">
@@ -114,9 +110,7 @@ export default function Login({ loaderData }: Route.ComponentProps) {
                 aria-invalid={errors.email ? true : undefined}
                 {...register("email")}
               />
-              {errors.email && (
-                <p className="text-sm text-destructive">{errors.email.message}</p>
-              )}
+              {errors.email && <p className="text-sm text-destructive">{errors.email.message}</p>}
             </div>
 
             <div className="space-y-2">
@@ -150,11 +144,7 @@ export default function Login({ loaderData }: Route.ComponentProps) {
               </div>
             )}
 
-            <Button
-              type="submit"
-              className="w-full h-11"
-              disabled={isSubmitting}
-            >
+            <Button type="submit" className="w-full h-11" disabled={isSubmitting}>
               {isSubmitting ? t("common.signingIn") : t("common.signIn")}
             </Button>
           </form>

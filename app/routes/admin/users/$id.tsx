@@ -13,7 +13,7 @@ import { Label } from "~/components/ui/label";
 
 const schema = z.object({
   name: z.string().min(1, i18n.t("validation.nameRequired")),
-  email: z.string().email(i18n.t("validation.invalidEmail")),
+  email: z.email(i18n.t("validation.invalidEmail")),
   role: z.string().optional(),
 });
 
@@ -77,7 +77,11 @@ export async function action({ request, params }: Route.ActionArgs) {
 }
 
 export function meta({ data }: Route.MetaArgs) {
-  return [{ title: `${i18n.t("admin.editUser.title")} - ${data?.user.email || i18n.t("common.user")} - ${i18n.t("admin.sidebar.appName")}` }];
+  return [
+    {
+      title: `${i18n.t("admin.editUser.title")} - ${data?.user.email || i18n.t("common.user")} - ${i18n.t("admin.sidebar.appName")}`,
+    },
+  ];
 }
 
 export default function EditUser({ loaderData }: Route.ComponentProps) {
@@ -99,10 +103,10 @@ export default function EditUser({ loaderData }: Route.ComponentProps) {
             {t("admin.editUser.backToUsers")}
           </Link>
         </Button>
-        <h1 className="text-3xl font-bold tracking-tight text-foreground">{t("admin.editUser.title")}</h1>
-        <p className="text-muted-foreground mt-1">
-          {t("admin.editUser.subtitle")}
-        </p>
+        <h1 className="text-3xl font-bold tracking-tight text-foreground">
+          {t("admin.editUser.title")}
+        </h1>
+        <p className="text-muted-foreground mt-1">{t("admin.editUser.subtitle")}</p>
       </div>
 
       <div className="rounded-xl border bg-card shadow-sm p-6">
@@ -138,13 +142,17 @@ export default function EditUser({ loaderData }: Route.ComponentProps) {
 
       {hasPendingInvite && (
         <div className="rounded-xl border bg-card shadow-sm p-6">
-          <h3 className="text-base font-semibold text-foreground mb-1">{t("admin.editUser.pendingInvite")}</h3>
+          <h3 className="text-base font-semibold text-foreground mb-1">
+            {t("admin.editUser.pendingInvite")}
+          </h3>
           <p className="text-sm text-muted-foreground mb-4">
             {t("admin.editUser.pendingInviteDescription")}
           </p>
           {actionData?.success?.invite && (
             <div className="rounded-md bg-green-500/10 border border-green-500/20 px-4 py-3 mb-4">
-              <p className="text-sm text-green-700 dark:text-green-400">{actionData.success.invite}</p>
+              <p className="text-sm text-green-700 dark:text-green-400">
+                {actionData.success.invite}
+              </p>
             </div>
           )}
           {actionData?.errors?.invite && (
@@ -209,7 +217,9 @@ export default function EditUser({ loaderData }: Route.ComponentProps) {
               <option value="admin">{t("common.admin")}</option>
             </select>
             {isSelf && (
-              <p className="text-xs text-muted-foreground">{t("admin.editUser.cannotChangeOwnRole")}</p>
+              <p className="text-xs text-muted-foreground">
+                {t("admin.editUser.cannotChangeOwnRole")}
+              </p>
             )}
           </div>
 
@@ -226,10 +236,10 @@ export default function EditUser({ loaderData }: Route.ComponentProps) {
       </div>
 
       <div className="rounded-xl border border-destructive/50 bg-destructive/5 shadow-sm p-6">
-        <h3 className="text-lg font-semibold text-foreground mb-2">{t("admin.editUser.dangerZone")}</h3>
-        <p className="text-sm text-muted-foreground mb-4">
-          {t("admin.editUser.deleteWarning")}
-        </p>
+        <h3 className="text-lg font-semibold text-foreground mb-2">
+          {t("admin.editUser.dangerZone")}
+        </h3>
+        <p className="text-sm text-muted-foreground mb-4">{t("admin.editUser.deleteWarning")}</p>
         {isSelf ? (
           <div className="rounded-lg border border-amber-500/50 bg-amber-500/10 p-4 mb-4">
             <p className="text-sm text-amber-700 dark:text-amber-400">
@@ -249,11 +259,7 @@ export default function EditUser({ loaderData }: Route.ComponentProps) {
             variant="destructive"
             disabled={isSubmitting || isSelf}
             onClick={(e) => {
-              if (
-                !confirm(
-                  t("admin.editUser.confirmDelete", { email: user.email })
-                )
-              ) {
+              if (!confirm(t("admin.editUser.confirmDelete", { email: user.email }))) {
                 e.preventDefault();
               }
             }}

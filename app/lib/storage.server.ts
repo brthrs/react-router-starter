@@ -14,18 +14,17 @@ const log = logger.child({ module: "storage" });
 
 const useS3 = !!process.env.S3_BUCKET;
 
-const s3 =
-  useS3
-    ? new S3Client({
-        region: process.env.S3_REGION ?? "auto",
-        endpoint: process.env.S3_ENDPOINT,
-        credentials: {
-          accessKeyId: process.env.S3_ACCESS_KEY_ID ?? "",
-          secretAccessKey: process.env.S3_SECRET_ACCESS_KEY ?? "",
-        },
-        forcePathStyle: !!process.env.S3_ENDPOINT,
-      })
-    : null;
+const s3 = useS3
+  ? new S3Client({
+      region: process.env.S3_REGION ?? "auto",
+      endpoint: process.env.S3_ENDPOINT,
+      credentials: {
+        accessKeyId: process.env.S3_ACCESS_KEY_ID ?? "",
+        secretAccessKey: process.env.S3_SECRET_ACCESS_KEY ?? "",
+      },
+      forcePathStyle: !!process.env.S3_ENDPOINT,
+    })
+  : null;
 
 const LOCAL_UPLOAD_DIR = join(process.cwd(), "public", "uploads");
 

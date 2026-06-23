@@ -18,7 +18,7 @@ import { Checkbox } from "~/components/ui/checkbox";
 import { RouteErrorBoundary } from "~/components/route-error-boundary";
 
 const passwordSchema = z.object({
-  password: z.string().min(1, i18n.t("validation.passwordRequired")),
+  password: z.string().min(1, i18n.t("validation.passwordRequired")).max(128),
 });
 type PasswordValues = z.infer<typeof passwordSchema>;
 
@@ -98,9 +98,7 @@ export default function SetupTwoFactor({ loaderData }: Route.ComponentProps) {
       <div className="w-full max-w-md space-y-8">
         <div className="text-center">
           <div className="flex items-center justify-center gap-2 mb-2">
-            <h1 className="text-4xl font-bold tracking-tight">
-              {t("auth.setup2fa.title")}
-            </h1>
+            <h1 className="text-4xl font-bold tracking-tight">{t("auth.setup2fa.title")}</h1>
           </div>
           <div className="flex justify-center mt-2 mb-1">
             <span className="inline-flex items-center rounded-full bg-destructive/10 border border-destructive/20 px-2.5 py-0.5 text-xs font-medium text-destructive">
@@ -112,13 +110,8 @@ export default function SetupTwoFactor({ loaderData }: Route.ComponentProps) {
 
         <div className="bg-card rounded-lg shadow-sm border p-8 space-y-6">
           {state.step === "password" && (
-            <form
-              onSubmit={passwordForm.handleSubmit(handlePasswordSubmit)}
-              className="space-y-4"
-            >
-              <p className="text-sm text-muted-foreground">
-                {t("profile.twoFactor.setupPrompt")}
-              </p>
+            <form onSubmit={passwordForm.handleSubmit(handlePasswordSubmit)} className="space-y-4">
+              <p className="text-sm text-muted-foreground">{t("profile.twoFactor.setupPrompt")}</p>
               <div className="space-y-2">
                 <Label htmlFor="password">{t("common.password")}</Label>
                 <Input
@@ -171,9 +164,7 @@ export default function SetupTwoFactor({ loaderData }: Route.ComponentProps) {
               </div>
 
               <div className="space-y-3">
-                <p className="text-sm font-medium">
-                  {t("profile.twoFactor.saveBackupCodes")}
-                </p>
+                <p className="text-sm font-medium">{t("profile.twoFactor.saveBackupCodes")}</p>
                 <BackupCodeGrid codes={state.backupCodes} />
                 <p className="text-xs text-muted-foreground">
                   {t("profile.twoFactor.backupCodesNote")}
@@ -182,14 +173,9 @@ export default function SetupTwoFactor({ loaderData }: Route.ComponentProps) {
                   <Checkbox
                     id="codes-confirmed"
                     checked={codesConfirmed}
-                    onCheckedChange={(checked) =>
-                      setCodesConfirmed(checked === true)
-                    }
+                    onCheckedChange={(checked) => setCodesConfirmed(checked === true)}
                   />
-                  <Label
-                    htmlFor="codes-confirmed"
-                    className="text-sm font-normal cursor-pointer"
-                  >
+                  <Label htmlFor="codes-confirmed" className="text-sm font-normal cursor-pointer">
                     {t("profile.twoFactor.savedCodesConfirm")}
                   </Label>
                 </div>
@@ -197,10 +183,7 @@ export default function SetupTwoFactor({ loaderData }: Route.ComponentProps) {
 
               <div className="space-y-2">
                 <p className="text-sm font-medium">{t("profile.twoFactor.verifyStep")}</p>
-                <form
-                  onSubmit={codeForm.handleSubmit(handleCodeSubmit)}
-                  className="flex gap-2"
-                >
+                <form onSubmit={codeForm.handleSubmit(handleCodeSubmit)} className="flex gap-2">
                   <Input
                     type="text"
                     inputMode="numeric"
@@ -279,21 +262,13 @@ function BackupCodeGrid({ codes }: { codes: string[] }) {
         ))}
       </div>
       <div className="flex gap-2">
-        <Button
-          type="button"
-          variant="outline"
-          size="sm"
-          className="gap-1.5"
-          onClick={handleCopy}
-        >
+        <Button type="button" variant="outline" size="sm" className="gap-1.5" onClick={handleCopy}>
           {copied ? (
             <Check className="h-3.5 w-3.5 text-green-600" />
           ) : (
             <Clipboard className="h-3.5 w-3.5" />
           )}
-          {copied
-            ? t("profile.twoFactor.copiedCodes")
-            : t("profile.twoFactor.copyCodes")}
+          {copied ? t("profile.twoFactor.copiedCodes") : t("profile.twoFactor.copyCodes")}
         </Button>
         <Button
           type="button"

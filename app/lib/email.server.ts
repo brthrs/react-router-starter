@@ -1,5 +1,9 @@
+// nodemailer is v9 but @types/nodemailer is still v8 (DefinitelyTyped has no v9
+// yet, and v9 ships no bundled types). The API we use is unchanged across v8→v9.
+// Bump @types/nodemailer to ^9 once it's published.
 import nodemailer from "nodemailer";
 import { logger } from "./logger.server";
+import { renderEmail } from "./email-templates.server";
 
 const log = logger.child({ module: "email" });
 
@@ -20,7 +24,29 @@ export interface SendEmailOptions {
   html?: string;
 }
 
-export function sendEmail(options: SendEmailOptions): void {
+export interface SendEmailWithTemplate {
+  to: string;
+  subject: string;
+  template: string;
+  variables: Record<string, string>;
+}
+
+export type SendEmailInput = SendEmailOptions | SendEmailWithTemplate;
+
+function isTemplateEmail(input: SendEmailInput): input is SendEmailWithTemplate {
+  return "template" in input;
+}
+
+function resolveEmail(input: SendEmailInput): SendEmailOptions {
+  if (!isTemplateEmail(input)) return input;
+
+  const { html, text } = renderEmail(input.template, input.variables);
+  return { to: input.to, subject: input.subject, html, text };
+}
+
+export function sendEmail(input: SendEmailInput): void {
+  const options = resolveEmail(input);
+
   if (process.env.QUEUE_EMAILS === "true") {
     import("./queue.server").then(({ sendEmailJob }) => {
       sendEmailJob(options).catch((err) => {

@@ -12,7 +12,7 @@ import { Label } from "~/components/ui/label";
 
 const schema = z.object({
   name: z.string().min(1, i18n.t("validation.nameRequired")),
-  email: z.string().email(i18n.t("validation.invalidEmail")),
+  email: z.email(i18n.t("validation.invalidEmail")),
   role: z.string().optional(),
 });
 
@@ -60,10 +60,10 @@ export default function NewUser() {
             {t("admin.newUser.backToUsers")}
           </Link>
         </Button>
-        <h1 className="text-3xl font-bold tracking-tight text-foreground">{t("admin.newUser.title")}</h1>
-        <p className="text-muted-foreground mt-1">
-          {t("admin.newUser.subtitle")}
-        </p>
+        <h1 className="text-3xl font-bold tracking-tight text-foreground">
+          {t("admin.newUser.title")}
+        </h1>
+        <p className="text-muted-foreground mt-1">{t("admin.newUser.subtitle")}</p>
       </div>
 
       <div className="rounded-xl border bg-card shadow-sm p-6">

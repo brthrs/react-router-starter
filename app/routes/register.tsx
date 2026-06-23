@@ -26,8 +26,8 @@ export async function loader({ request }: LoaderFunctionArgs) {
 const schema = z
   .object({
     name: z.string().min(1, i18n.t("validation.nameRequired")),
-    email: z.string().email(i18n.t("validation.invalidEmail")),
-    password: z.string().min(8, i18n.t("validation.passwordMin8")),
+    email: z.email(i18n.t("validation.invalidEmail")),
+    password: z.string().min(8, i18n.t("validation.passwordMin8")).max(128),
     confirmPassword: z.string(),
   })
   .refine((data) => data.password === data.confirmPassword, {
@@ -81,9 +81,7 @@ export default function Register() {
                 {...register("name")}
                 aria-invalid={errors.name ? true : undefined}
               />
-              {errors.name && (
-                <p className="text-sm text-destructive">{errors.name.message}</p>
-              )}
+              {errors.name && <p className="text-sm text-destructive">{errors.name.message}</p>}
             </div>
 
             <div className="space-y-2">
@@ -98,9 +96,7 @@ export default function Register() {
                 {...register("email")}
                 aria-invalid={errors.email ? true : undefined}
               />
-              {errors.email && (
-                <p className="text-sm text-destructive">{errors.email.message}</p>
-              )}
+              {errors.email && <p className="text-sm text-destructive">{errors.email.message}</p>}
             </div>
 
             <div className="space-y-2">

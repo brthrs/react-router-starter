@@ -10,7 +10,7 @@ export async function createInvite(
   userId: string | null,
   email: string,
   name: string,
-  role: string
+  role: string,
 ) {
   const token = randomBytes(32).toString("hex");
   const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
@@ -28,8 +28,8 @@ export async function createInvite(
     sendEmail({
       to: email,
       subject: "You've been invited",
-      text: `You've been invited to join. Click the link to set up your account: ${inviteUrl}`,
-      html: `<p>You've been invited to join. Click the link to set up your account:</p><p><a href="${inviteUrl}">${inviteUrl}</a></p><p>This link expires in 7 days.</p>`,
+      template: "invite",
+      variables: { inviteUrl },
     });
   }
 }

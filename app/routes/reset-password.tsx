@@ -17,7 +17,7 @@ export function meta(_args: Route.MetaArgs) {
 
 const schema = z
   .object({
-    password: z.string().min(8, i18n.t("validation.passwordMin8")),
+    password: z.string().min(8, i18n.t("validation.passwordMin8")).max(128),
     confirmPassword: z.string(),
   })
   .refine((data) => data.password === data.confirmPassword, {
@@ -59,7 +59,10 @@ export default function ResetPassword() {
         <div className="w-full max-w-md text-center space-y-4">
           <h1 className="text-2xl font-bold">{t("auth.resetPassword.invalidLink")}</h1>
           <p className="text-muted-foreground">{t("auth.resetPassword.invalidLinkDescription")}</p>
-          <Link to="/forgot-password" className="text-sm font-medium text-foreground underline underline-offset-4">
+          <Link
+            to="/forgot-password"
+            className="text-sm font-medium text-foreground underline underline-offset-4"
+          >
             {t("auth.resetPassword.requestNewLink")}
           </Link>
         </div>
@@ -72,8 +75,13 @@ export default function ResetPassword() {
       <div className="flex min-h-screen items-center justify-center bg-background px-4">
         <div className="w-full max-w-md text-center space-y-4">
           <h1 className="text-2xl font-bold">{t("auth.resetPassword.passwordUpdated")}</h1>
-          <p className="text-muted-foreground">{t("auth.resetPassword.passwordUpdatedDescription")}</p>
-          <Link to="/login" className="text-sm font-medium text-foreground underline underline-offset-4">
+          <p className="text-muted-foreground">
+            {t("auth.resetPassword.passwordUpdatedDescription")}
+          </p>
+          <Link
+            to="/login"
+            className="text-sm font-medium text-foreground underline underline-offset-4"
+          >
             {t("auth.resetPassword.signInWithNewPassword")}
           </Link>
         </div>

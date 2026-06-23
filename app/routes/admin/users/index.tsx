@@ -79,10 +79,10 @@ export default function Users({ loaderData }: Route.ComponentProps) {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight text-foreground">{t("admin.users.title")}</h1>
-          <p className="text-muted-foreground mt-1">
-            {t("admin.users.subtitle")}
-          </p>
+          <h1 className="text-3xl font-bold tracking-tight text-foreground">
+            {t("admin.users.title")}
+          </h1>
+          <p className="text-muted-foreground mt-1">{t("admin.users.subtitle")}</p>
         </div>
         <Button asChild>
           <Link to="/admin/users/new">
@@ -144,14 +144,10 @@ export default function Users({ loaderData }: Route.ComponentProps) {
                 users.map((user) => (
                   <tr key={user.id} className="hover:bg-muted/30 transition-colors">
                     <td className="px-6 py-4">
-                      <div className="text-sm font-medium text-foreground">
-                        {user.email}
-                      </div>
+                      <div className="text-sm font-medium text-foreground">{user.email}</div>
                     </td>
                     <td className="px-6 py-4">
-                      <div className="text-sm text-muted-foreground">
-                        {user.name}
-                      </div>
+                      <div className="text-sm text-muted-foreground">{user.name}</div>
                     </td>
                     <td className="px-6 py-4">
                       <span
@@ -216,7 +212,10 @@ export default function Users({ loaderData }: Route.ComponentProps) {
                 {t("common.previous")}
               </Button>
               <div className="text-sm text-muted-foreground">
-                {t("admin.users.pageOf", { current: pagination.currentPage, total: pagination.totalPages })}
+                {t("admin.users.pageOf", {
+                  current: pagination.currentPage,
+                  total: pagination.totalPages,
+                })}
               </div>
               <Button
                 variant="outline"

@@ -10,12 +10,17 @@ jobs:
   ci:
     runs-on: ubuntu-latest
 
+    # Placeholder — generate/build/typecheck/test never connect to a DB,
+    # but prisma.config.ts requires DATABASE_URL to resolve at load time.
+    env:
+      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/postgres
+
     steps:
       - uses: actions/checkout@v4
 
       - uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version-file: .tool-versions
           cache: npm
 
       - run: npm ci

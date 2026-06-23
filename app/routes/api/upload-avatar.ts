@@ -17,7 +17,10 @@ export async function action({ request }: ActionFunctionArgs) {
   }
 
   if (!ALLOWED_TYPES.includes(file.type)) {
-    return Response.json({ error: "Invalid file type. Use JPEG, PNG, WebP, or GIF." }, { status: 400 });
+    return Response.json(
+      { error: "Invalid file type. Use JPEG, PNG, WebP, or GIF." },
+      { status: 400 },
+    );
   }
 
   if (file.size > MAX_SIZE) {
